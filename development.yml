@@ -1,0 +1,21 @@
+services:
+  # マルチステージビルドなフロントエンドコンテナ (最終的に動くのはnginxだが、node.jsでviteをビルドしてから、nginxで配信する)
+  front_nginx:
+    build:
+      context: .  # このサービスについてはビルド時はfrontendを基準ディレクトリにするのではなく、このymlファイルがある場所になります。
+      dockerfile: ./frontend/dockerfile/development/Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend:/app  # ホストの ./frontend をコンテナの /app にマウント（コード変更が即反映される）
+      - ./front_nginx:/front_nginx
+      - node_modules:/app/node_modules  # node_modules はボリュームで分離（ホストと衝突を避ける）ただしこのディレクトリはroot所有者になる。
+volumes:
+  db_data:
+  node_modules:  # Vueプロジェクトの依存ファイルを保持するボリューム
+  # frontend_build:  # フロントエンドのビルド結果を格納するボリューム
+
+#-------
+#このdocker-compose.ymlを使う場合、フロントエンドのビルドのためのコマンドと、配信のためのコマンドを叩く必要がある。
+# ビルド : docker-compose -f development.yml run --rm frontend-builder
+# 配信   : docker-compose -f development.yml up nginx

@@ -1,0 +1,28 @@
+services:
+  frontend-builder:
+    # 使用するimageの指定(dockerfileはいらない)
+    image: node:22.14.0-bullseye-slim
+    working_dir: /app  # コンテナを起動した後の、コンテナ内での作業ディレクトリ commandやentrypointはこのディレクトリを基準とする
+    container_name: djangoblog_devlopment_front_builder  # 起動するコンテナの名前（任意）
+    volumes:
+      - ./frontend:/app  # ホストの ./frontend をコンテナの /app にマウント（コード変更が即反映される）
+    command: sh -c "npm install && npm run build"  # ビルドして終了　ビルド結果は ./frontend/dist に出力される
+  nginx:
+    image: nginx:latest
+    container_name: djangoblog_devlopment_front_nginx
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html:ro  # ビルド済み静的ファイルをマウント
+    depends_on:
+      - frontend-builder
+volumes:
+  db_data:
+  node_modules:  # Vueプロジェクトの依存ファイルを保持するボリューム
+  # frontend_build:  # フロントエンドのビルド結果を格納するボリューム
+
+#-------
+#このdocker-compose.ymlを使う場合、フロントエンドのビルドのためのコマンドと、配信のためのコマンドを叩く必要がある。
+# ビルド : docker-compose -f development.yml run --rm frontend-builder
+# 配信   : docker-compose -f development.yml up nginx
