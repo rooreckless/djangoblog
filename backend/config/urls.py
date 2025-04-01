@@ -14,9 +14,25 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from django.conf import settings
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
+from rest_framework import routers
+from api.blog.views import BlogViewSet
+# DRFのviewsetを作成したなら、SimpleRouterにregisterします。
+# 例えば、blogs/views.pyではBlogViewSethはviewsets.GenericViewSetを継承したクラスベースビューになっているが、これをurls.pyで登録するにはroute.registerするだけでいい。
+# GenericAPIViewを継承したクラスベースビューだと、urlpattersにpathとして追加する 必要がでる。
+router = routers.SimpleRouter()
+router.register(r'api/v1/blogs', BlogViewSet, basename="blog")
 
+# Djangoとしてはurlpatternsにrouterをincloudeしたpathを追加する
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # ↓drg-spectacularによるドキュメント化のため↓2つを追加
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    # viewsetを使えるようにするため追加
+    path('', include(router.urls)),
+    
 ]
