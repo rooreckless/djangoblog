@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -37,6 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #↓の2つを追加しapiアプリへのアクセスを可能にして、そのアクセスをブラウザでRestFramework画面で見れるようにする
+    "rest_framework",
+    "api",
+    # swaggerUIを用いたAPIのドキュメンテーションに必要
+    'drf_spectacular'
 ]
 
 MIDDLEWARE = [
@@ -73,11 +78,36 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# docker-composeのpostgresqlにつなぐのに必要
+# なお pip install pycopg[binary]がないと動かない　https://github.com/psycopg/psycop
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('POSTGRES_DB'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': os.environ.get('POSTGRES_HOST'),
+        'PORT': os.environ.get('POSTGRES_PORT'),
     }
+}
+
+REST_FRAMEWORK = {
+    # drf-specutacularを使うために使う https://drf-spectacular.readthedocs.io/en/latest/readme.html
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    # DRFとしては、jsonを返すようにし、ブラウザでAPIを実行した結果を見られるようにする。
+    # https://www.django-rest-framework.org/api-guide/renderers/
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ]
+}
+# drf-specutacularで表示するページ用の設定
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Your Project API',                # タイトル
+    'DESCRIPTION': 'Your project description',  # 説明
+    'VERSION': '0.0.1',                         # 表記するバージョン
+    'SERVE_INCLUDE_SCHEMA': False,              # Trueにすると、 /api/schema　も表示されるようになるがいらないのでFalseにする
+    # OTHER SETTINGS
 }
 
 
@@ -103,13 +133,15 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
+# 日本語化とTZのJST指定
+LANGUAGE_CODE = 'ja'
+# https://djangobrothers.com/blogs/django_datetime_localtime/
+USE_TZ = True
+TIME_ZONE = 'Asia/Tokyo'
 
 USE_I18N = True
 
-USE_TZ = True
+
 
 
 # Static files (CSS, JavaScript, Images)
