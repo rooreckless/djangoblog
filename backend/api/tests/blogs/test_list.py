@@ -44,7 +44,6 @@ def test_return_page_size(db, api_client):
     response = api_client.get("/api/v1/blogs/?size=3&page=2")
     assert response.status_code == 200
     data = response.json()
-    print("---data=",data)
     # apiの出力の内resultsの長さは3(=size)のはず
     assert len(data["results"]) == 3
     assert data["current_page"] == 2
