@@ -64,3 +64,10 @@ CMD ["/bin/bash"]
 # それでも、docker-compose up --build frontendを実行したら、このDockerfileが実行される = npm installが行われるので、package.jsonからインストールされます。
 # つまりソースコードが残っているなら、問題なく起動できるはずです。
 
+#----
+# もし必要なライブラリを追加したくなったら、frontendコンテナが動いている状態ならば、
+# docker-compose -f local.yml exec frontend /bin/bashでログイン後に、npm install しましょう。
+# たとえばhttps://router.vuejs.org/installation.htmlを参考に、 npm install vue-router とします。
+# 他にもhttps://pinia.vuejs.org/getting-started.htmlからpiniaを、https://headlessui.com/v1/vue からheadless uiをいれたりもしています。
+# さらにvee-validateはhttps://vee-validate.logaretm.com/v4/guide/overview/ から、yupはhttps://www.npmjs.com/package/yup からです。
+# https://reffect.co.jp/vue/veevaliate4
