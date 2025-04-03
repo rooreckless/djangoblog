@@ -19,4 +19,10 @@ sqlparse==0.5.3
 typing_extensions==4.12.2
 uritemplate==4.1.1
 psycopg[binary]==3.2.6 # https://github.com/psycopg/psycopg
-
+#--test用に追加されたライブラリ--
+pytest==8.3.5
+pytest-xdist==3.6.1
+pytest-sugar==1.0.0
+pytest-mock==3.14.0
+pytest-django==4.10.0
+factory_boy==3.3.3

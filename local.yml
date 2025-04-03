@@ -25,6 +25,8 @@ services:
       - ./.envs/local/postgres
     volumes:
       - ./backend:/app
+      # 以下はバックエンドディレクトリの外にあるpytestファイルを、コンテナのapp内に置かないとテストができないのでマウント
+      - ./pytest.ini:/app/pytest.ini
     ports:
       - "8000:8000"
     command: python manage.py runserver 0.0.0.0:8000

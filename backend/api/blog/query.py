@@ -38,8 +38,8 @@ class BlogQueryService:
         self.validated_data = validated_data
     
     def get_queryset(self):
-        # 初期クエリセット（デフォルトの並び順なし）
-        queryset = Blog.objects.all().order_by()
+        # 初期クエリセット（デフォルトの並び順は、作成日降順 = 最近作成したものから順）
+        queryset = Blog.objects.all().order_by("-created")
         # タイトルによる部分一致フィルター（case insensitive）
         title = self.validated_data.get('title')
         if title:

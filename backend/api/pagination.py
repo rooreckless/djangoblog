@@ -4,9 +4,10 @@ from rest_framework.response import Response
 
 class ListPagination(pg.PageNumberPagination):
     """全ての一覧表示で使うためのページネーションクラス"""
-    page_size = 2            # デフォルトの件数
+    page_size = 10            # デフォルトの1ページあたりの件数
     max_page_size = 100      # 1ページあたりの件数の上限
-    page_size_query_param = "size"  # クエリパラメータでは?size=3とかを指定できるようになる
+    page_size_query_param = "size"  # クエリパラメータではsizeというパラメータで1ページあたりの件数を指定するようになる。
+    # 具体的には?size=3とかを指定できるようになる
 
     def get_paginated_response(self, data) -> Response:
         # PageNumberPaginationクラスではget_paginated_responseがあるが、これをオーバーライドしてカスタマイズしている

@@ -58,7 +58,7 @@ class BlogViewSet(viewsets.GenericViewSet):
         # ② リクエストのバリデーションチェックは終わったので、BlogQueryService を使って、検索条件付きクエリセットを取得
         service = BlogQueryService(request_serializer.validated_data)
         # クエリのget_querysetメソッドを明示的に実行 = タイトルでの絞り込みや並び替えをするのがここ
-        # 結果はクエリセット
+        # 結果はクエリセット(厳密にはまだ、この段階のquerysetは絞り込み結果(SQL実行結果)ではない。SQL準備段階)
         queryset = service.get_queryset()
 
         # ③ ページネーションを適用(スライス)
@@ -67,6 +67,9 @@ class BlogViewSet(viewsets.GenericViewSet):
         # = 継承しているrest_framework.pagination.PageNumberPaginationクラスのpaginate_queryset()を使う
         # そのクラスのpaginate_querysetわたす引数はクエリの実行結果 = 絞り込みを行った結果 を渡すことで、ページネーションを実行する
         page = self.paginate_queryset(queryset) # ← size, page のパラメータを内部で参照　pagination_classに指定したクラスの
+        # ↑ちなみに、querysetはこのself.paginate_queryset(queryset)でSQLが評価される。querysetがlist()にラップされて、スライスされるので。
+        # なので返り値のpageはリスト
+
         if page is not None:
             # ④ページ単位でレスポンス用シリアライザに通し、viewとして返す形に整える → カスタムページネーションの形式でレスポンスするということ
             response_serializer = BlogResponseSerializer(page, many=True)
