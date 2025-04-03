@@ -3,14 +3,14 @@ import { createRouter, createWebHistory } from 'vue-router'
 // ルーティングを記載する部分
 const routes = [
   {
-    path: '/',
-    name: 'Home',
-    component: () => import('@/pages/TopPage.vue'), // 後ほど作成
+    path: '/blogs',
+    name: 'BlogList',
+    component: () => import('@/pages/BlogList.vue'), // 後ほど作成
   },
   {
     path: '/blogs/:id',
     name: 'BlogDetail',
-    component: () => import('@/pages/BlogDetailPage.vue'), // 後ほど作成
+    component: () => import('@/pages/BlogDetail.vue'), // 後ほど作成
   },
 ]
 // main.tsでよみこむrouter(はcreateRouterオブジェクト)

@@ -31,7 +31,9 @@ WORKDIR /app
 #----------
 
 COPY package*.json ./
-RUN npm install
+# npm install はrootユーザーで行う必要がある でもその後はuid=1000=多分nodeユーザーで起動させたいので、
+# node_modulesの所有者を1000:1000にする
+RUN npm install && chown -R 1000:1000 /app/node_modules
 
 # デフォルトのコマンド。docker-composeでcommand指定するのでこの行は実行されないが一応指定。
 CMD ["/bin/bash"]
@@ -41,9 +43,14 @@ CMD ["/bin/bash"]
 # 1
 # viteプロジェクト作成 
 # ↑docker-compose run --rm frontend npm create vite@latest . -- --template vue-ts
+
+# ===OLD情報===
 # ただし生成されたファイル・ディレクトリの所有者、所有グループがrootになっています。
 # ローカルでsudo chown -R $USER:$USER ./frontendと、sudo chmod -R 777 ./frontend を実行するか、
 # コンテナ内で、chown -R 1000:1000 /appと、chmod -R 777 /appを実行しておきましょう。
+# 【OLD情報に対する追記】user: "${UID:-1000}:${GID:-1000}"をdocker-compose.ymlに書き込んでいるので、docker-composeコマンドを使う時はuid=1000でログインする。
+# その状態で生成されるファイルは1000:1000の所有者・所有グループとなる。なので問題ない。
+# =============
 #----------
 # 2
 # tailwindcssインストールの参考先 https://tailwindcss.com/docs/installation/using-vite
