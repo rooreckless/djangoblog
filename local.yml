@@ -1,15 +1,39 @@
 services:
+  # postgres:
+  #   image: postgres:15
+  #   container_name: djangoblog_local_postgres
+  #   restart: always
+  #   # user: "${UID}:${GID}" # いらん
+  #   env_file:
+  #     - ./.envs/local/postgres
+  #   volumes:
+  #     - db_data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+  #   healthcheck:
+  #     # test: ["CMD-SHELL", "pg_isready -U dbuser -d djangoblog"]
+  #     test: ["CMD-SHELL", "pg_isready -U dbuser -d djangoblog"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5
   postgres:
-    image: postgres:15
+    build:
+      context: ./postgres
     container_name: djangoblog_local_postgres
     restart: always
-    # user: "${UID}:${GID}" # いらん
     env_file:
       - ./.envs/local/postgres
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    # user: "${UID:-1000}:${GID:-1000}" #<- postgresにはこれはかけない
+    healthcheck:
+      #ヘルスチェック(postgresが正常に動作しているかどうか)は以下のスクリプトを実行して行う
+      test: ["CMD", "/usr/local/bin/check-db.sh"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   backend:
     build:
       context: .
@@ -18,8 +42,10 @@ services:
     image: djangoblog_local_backend_img
     container_name: djangoblog_local_backend
     restart: always
+    user: "${UID:-1000}:${GID:-1000}"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     env_file:
       - ./.envs/local/django
       - ./.envs/local/postgres
@@ -41,7 +67,7 @@ services:
     volumes:
       - ./frontend:/app  # ホストの ./frontend をコンテナの /app にマウント（コード変更が即反映される）
       - node_modules:/app/node_modules  # node_modules はボリュームで分離（ホストと衝突を避ける）ただしこのディレクトリはroot所有者になる。
-    # user: "${UID:-1000}:${GID:-1000}" # docker-composeコマンドでの操作はこのuid,gidで実施する(default値はともに1000) このdocker-compose.yml内でファイルを生成するときに重要
+    user: "${UID:-1000}:${GID:-1000}" # docker-composeコマンドでの操作はこのuid,gidで実施する(default値はともに1000) このdocker-compose.yml内でファイルを生成するときに重要
     # だがuser:をいれたらnode_modulesがroot以外になり、するとエラーになるので廃止
     restart: always  # コンテナが落ちたときに自動で再起動
     ports:

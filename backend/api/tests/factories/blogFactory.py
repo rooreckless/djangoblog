@@ -13,6 +13,6 @@ class BlogFactory(factory.django.DjangoModelFactory):
     # Blogモデルのレコードを作る際、自力での入力が必要な列については以下のように列名のフィールド定義が必要
     # factory.Fakerはランダムな文字列を作成するのに使用する
     # sentenceで「短めの文章」で、nb_words=4は「4単語でつくる」の意味
-    title = factory.Faker("sentence", nb_words=4)
+    title = factory.Faker("sentence", nb_words=4, locale="ja_JP")
     # textが引数になっていると通常文字列だが、max_nb_chars=1000で「最大で1000文字までの長さ」になる
-    contents_text = factory.Faker("text", max_nb_chars=1000)
+    contents_text = factory.Faker("text", max_nb_chars=1000, locale="ja_JP")
