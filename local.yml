@@ -1,24 +1,9 @@
 services:
-  # postgres:
-  #   image: postgres:15
-  #   container_name: djangoblog_local_postgres
-  #   restart: always
-  #   # user: "${UID}:${GID}" # いらん
-  #   env_file:
-  #     - ./.envs/local/postgres
-  #   volumes:
-  #     - db_data:/var/lib/postgresql/data
-  #   ports:
-  #     - "5432:5432"
-  #   healthcheck:
-  #     # test: ["CMD-SHELL", "pg_isready -U dbuser -d djangoblog"]
-  #     test: ["CMD-SHELL", "pg_isready -U dbuser -d djangoblog"]
-  #     interval: 5s
-  #     timeout: 5s
-  #     retries: 5
   postgres:
     build:
       context: ./postgres
+      dockerfile: ./Dockerfile
+    image: djangoblog_local_postgres_img
     container_name: djangoblog_local_postgres
     restart: always
     env_file:
@@ -73,6 +58,22 @@ services:
     ports:
       - "5173:5173"  # ホストの5173番ポートをコンテナの5173番ポートに接続（Viteの開発サーバ用）
     command: npm run dev --host # コンテナ起動時にVite開発サーバを起動
+  playwright:
+    build:
+      context: .
+      dockerfile: ./playwright/local/Dockerfile
+    image: djangoblog_local_playwright_img
+    container_name: djangoblog_local_playwright
+    profiles: # 単にdocker-compose upをしただけでは、このplaywrightサービスは動かないようにする --profile e2eが指定されたら動かせる
+      - e2e
+    depends_on:
+      - backend
+      - frontend
+    working_dir: /app
+    volumes:
+      - ./playwright:/app  # ← テストケースファイルはこの中のe2e_testsディレクトリだが、test_resultsもここに作成される
+    # entrypoint: [ "tail", "-f", "/dev/null" ]  # デバッグ用。任意で変更可。
+
   # nginx:
   #   image: nginx:latest
   #   container_name: djangoblog_local_nginx

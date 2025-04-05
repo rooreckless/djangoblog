@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold mb-4">ブログ一覧</h1>
+    <h1 data-testid="section_title" class="text-2xl font-bold mb-4">ブログ一覧</h1>
     <!-- ▶ ドロップダウン：ページサイズ選択 -->
     <div class="mb-4 flex items-center space-x-2">
       <label for="page-size" class="text-sm">1ページに表示する件数：</label>
@@ -74,6 +74,7 @@
   const getBlogLists = async ()=>{
     // const response = await fetch("http://localhost:8000/api/v1/blogs/");
     const response = await fetch(`http://localhost:8000/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
+    // const response = await fetch(`http://backend:8000/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
     let results=await response.json();
     blogs.value = results["results"];
     totalPages.value = results["num_of_pages"];
