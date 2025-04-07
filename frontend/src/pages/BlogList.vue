@@ -73,12 +73,20 @@
 
   
   const getBlogLists = async ()=>{
-    // const response = await fetch("http://localhost:8000/api/v1/blogs/");
-    const response = await fetch(`http://localhost:8000/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
-    // const response = await fetch(`http://backend:8000/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
-    let results=await response.json();
-    blogs.value = results["results"];
-    totalPages.value = results["num_of_pages"];
+    // // const response = await fetch("http://localhost:8000/api/v1/blogs/");
+    // const response = await fetch(`http://localhost:8000/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
+    // // const response = await fetch(`http://backend:8000/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
+    // let results=await response.json();
+    // blogs.value = results["results"];
+    // totalPages.value = results["num_of_pages"];
+    try {
+      const response = await fetch(`http://backend:8000/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
+      const results = await response.json();
+      console.log("Fetched results:", results);  // ← 追加
+      blogs.value = results["results"];
+    } catch (error) {
+      console.error("Error fetching blogs:", error);  // ← 追加
+    }
   };
 
   
