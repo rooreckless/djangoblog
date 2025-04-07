@@ -40,5 +40,11 @@ export default defineConfig({
     watch: {
       usePolling: true, // WSL2 や Docker でホットリロードを確実に機能させる
     },
+    allowedHosts: ['frontend'], // ← Playwright などからのアクセス用 page.content()をplaywrightのテストケースにいれたらエラーだったので。
+  },
+  test: {
+    environment: 'jsdom',     // ← 仮想ブラウザ環境を指定
+    globals: true,             // it/test/expect をグローバルに使えるように
+    include: ['tests/**/*.test.ts'], // 任意：テスト対象ファイルのパターン
   },
 })
