@@ -36,34 +36,31 @@ services:
       - ./.envs/local/postgres
     volumes:
       - ./backend:/app
-      # 以下はバックエンドディレクトリの外にあるpytestファイルを、コンテナのapp内に置かないとテストができないのでマウント
-      # - ./pytest.ini:/app/pytest.ini
     ports:
       - "8000:8000"
     command: python manage.py runserver 0.0.0.0:8000
   frontend:
-    build: # docker-compose buildまたは、docker-compose up --buildを使ったときの、Dockerfileを使ってイメージをビルドする設定
-      # https://qiita.com/Mayumi_Pythonista/items/f69f7a1e8b0bbeab9560
-      context: ./frontend # ビルドのコンテキスト（Dockerfileのベースとなるディレクトリ
-      dockerfile: ./dockerfile/local/Dockerfile   # 使用するDockerfileのパス ビルドでやることはこのDockerfileに記載
-    working_dir: /app  # コンテナを起動した後の、コンテナ内での作業ディレクトリ commandやentrypointはこのディレクトリを基準とする
-    image: djangoblog_local_frontend_img  # ビルド後のイメージ名
-    container_name: djangoblog_local_frontend  # 起動するコンテナの名前（任意）
+    build: 
+      context: ./frontend
+      dockerfile: ./dockerfile/local/Dockerfile
+    working_dir: /app
+    image: djangoblog_local_frontend_img
+    container_name: djangoblog_local_frontend
     volumes:
-      - ./frontend:/app  # ホストの ./frontend をコンテナの /app にマウント（コード変更が即反映される）
-      - node_modules:/app/node_modules  # node_modules はボリュームで分離（ホストと衝突を避ける）ただしこのディレクトリはroot所有者になる。
-    user: "${UID:-1000}:${GID:-1000}" # docker-composeコマンドでの操作はこのuid,gidで実施する(default値はともに1000) このdocker-compose.yml内でファイルを生成するときに重要
-    restart: always  # コンテナが落ちたときに自動で再起動
+      - ./frontend:/app
+      - node_modules:/app/node_modules
+    user: "${UID:-1000}:${GID:-1000}"
+    restart: always
     ports:
-      - "5173:5173"  # ホストの5173番ポートをコンテナの5173番ポートに接続（Viteの開発サーバ用）
-    command: npm run dev --host # コンテナ起動時にVite開発サーバを起動
+      - "5173:5173"
+    command: npm run dev --host
   playwright-mock:
     build:
       context: .
       dockerfile: ./playwright-mock/dockerfile/local/Dockerfile
     image: djangoblog_local_playwright_mock_img
     container_name: djangoblog_local_playwright_mock
-    profiles: # 単にdocker-compose upをしただけでは、このplaywrightサービスは動かないようにする --profile e2e-mockが指定されたら動かせる
+    profiles:
       - e2e-mock
     depends_on:
       - backend
@@ -72,7 +69,31 @@ services:
     volumes:
       - ./playwright-mock:/app  # ← テストケースファイルはこの中のe2e_testsディレクトリだが、test_resultsもここに作成される
     # entrypoint: [ "tail", "-f", "/dev/null" ]  # デバッグ用。任意で変更可。
-  
+  playwright-real:
+    build:
+      context: .
+      dockerfile: ./playwright-real/dockerfile/local/Dockerfile
+    image: djangoblog_local_playwright_real_img
+    container_name: djangoblog_local_playwright_real
+    profiles: # 単にdocker-compose upをしただけでは、このplaywrightサービスは動かないようにする --profile e2e-realが指定されたら動かせる
+      - e2e-real
+    # depends_on:
+    #   - backend
+    #   - frontend
+    working_dir: /app
+    volumes:
+      - ./playwright-real/e2e_tests:/app/e2e_tests
+      - ./backend:/app
+    env_file:
+      - ./.envs/local/django
+      - ./.envs/local/postgres
+    environment:
+      - DJANGO_ALLOW_ASYNC_UNSAFE=1
+    #   # - DJANGO_SETTINGS_MODULE=config.settings_fortest
+    #   - DJANGO_SETTINGS_MODULE=backend.config.settings_fortest
+    #   # - PYTHONPATH=/app/backend
+    #   - PYTHONPATH=/app
+    # entrypoint: [ "tail", "-f", "/dev/null" ]  # デバッグ用。任意で変更可
   # nginx:
   #   image: nginx:latest
   #   container_name: djangoblog_local_nginx
@@ -89,4 +110,4 @@ services:
   #     - "443:443"
 volumes:
   db_data:
-  node_modules:  # Vueプロジェクトの依存ファイルを保持するボリューム
+  node_modules:
