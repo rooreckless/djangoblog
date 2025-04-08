@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # extensions
+    'django_extensions',
     #↓の2つを追加しapiアプリへのアクセスを可能にして、そのアクセスをブラウザでRestFramework画面で見れるようにする
     "rest_framework",
     "api",
