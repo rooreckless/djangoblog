@@ -65,7 +65,7 @@
   import { ref, onMounted, watch } from "vue";
   import moment from "moment"
 
-  
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
   const blogs = ref([]);
   const currentPage = ref(1);
   const pageSize = ref(10);
@@ -80,7 +80,9 @@
     // blogs.value = results["results"];
     // totalPages.value = results["num_of_pages"];
     try {
-      const response = await fetch(`http://backend:8000/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
+      // const response = await fetch(`http://backend:8000/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
+      // const response = await fetch(`http://localhost:8000/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
+      const response = await fetch(`${baseURL}/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
       const results = await response.json();
       console.log("Fetched results:", results);  // ← 追加
       blogs.value = results["results"];
