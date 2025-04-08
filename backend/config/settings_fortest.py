@@ -21,6 +21,7 @@ TEMPLATES[0]["OPTIONS"]["debug"] = True  # type: ignore
 
 # テスト用DB名を明示的に設定
 DATABASES["default"]["TEST"] = {
+    # NAMEが開発用のdjangoblogと同じだと、テスト実行後に全レコードがきえてします。なのでe2eテスト専用DB名を与える必要があった。
     "NAME": "test_djangoblog",
     "MIRROR": None,
     "DEPENDENCIES": [],
@@ -29,14 +30,14 @@ DATABASES["default"]["TEST"] = {
 }
 
 # まだこのファイルを使う場合はCORSとして通すORIGINは全部
-# CORS_ALLOWED_ORIGINS = ["http://frontend:5173"]バックエンドへのテストができない
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = ["http://frontend:5173"] # バックエンドへのテストができない
+# CORS_ALLOW_ALL_ORIGINS = True
 # バックエンドとして受け付けるホスト。これがないと
 ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    "backend",  # ← docker-compose 内でのホスト名
-    "frontend",  # ← fetch の Origin として送られてくる
+    # "localhost",
+    # "127.0.0.1",
+    "backend",  # ← docker-compose 内でのホスト名 これがないとエラーになる
+    # "frontend", # ← なくてもテストは可能
 ]
 
 # このsettingsで使うDB名を確認するため使う

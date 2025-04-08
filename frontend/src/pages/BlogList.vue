@@ -25,7 +25,7 @@
         class="p-4 rounded-xl shadow bg-white border"
       >
       <router-link :to="`/blogs/${blog.id}`" data-testid="blog-title-link">
-        <h2 class="text-lg font-semibold">
+        <h2 class="text-lg font-semibold" :data-testid='`blog-title-${blog.id}`'>
           {{ blog.title }}
         </h2>
       </router-link>
@@ -43,6 +43,7 @@
         class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
         @click="currentPage--"
         :disabled="currentPage <= 1"
+        data-testid="blogs-previouspage-btn"
       >
         前へ
       </button>
@@ -53,6 +54,7 @@
         class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
         @click="currentPage++"
         :disabled="currentPage >= totalPages"
+        data-testid="blogs-nextpage-btn"
       >
         次へ
       </button>
@@ -73,26 +75,20 @@
 
   
   const getBlogLists = async ()=>{
-    // // const response = await fetch("http://localhost:8000/api/v1/blogs/");
-    // const response = await fetch(`http://localhost:8000/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
-    // // const response = await fetch(`http://backend:8000/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
-    // let results=await response.json();
-    // blogs.value = results["results"];
-    // totalPages.value = results["num_of_pages"];
     try {
-      // const response = await fetch(`http://backend:8000/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
-      // const response = await fetch(`http://localhost:8000/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
       const response = await fetch(`${baseURL}/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
       const results = await response.json();
-      console.log("Fetched results:", results);  // ← 追加
       blogs.value = results["results"];
+      totalPages.value = Math.ceil(results["num_of_items"] /pageSize.value);
     } catch (error) {
-      console.error("Error fetching blogs:", error);  // ← 追加
+      console.error("Error fetching blogs:", error);
     }
   };
 
+
   
   const init = async ()=>{
+    
     await getBlogLists();
   };
     onMounted(() => {
@@ -100,8 +96,9 @@
 
   });
     
-  watch([currentPage, pageSize], () => {
-    getBlogLists();
+  watch([currentPage, pageSize],async () => {
+    totalPages.value = Math.ceil(blogs.value.length/pageSize.value);
+    await getBlogLists();
   });
 
 </script>

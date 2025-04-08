@@ -59,8 +59,6 @@ services:
       - "5173:5173"
     command: npm run dev --host
     user: "${UID:-1000}:${GID:-1000}"
-    extra_hosts:
-      - "localhost:host-gateway"  # ← fetch("http://localhost:8000/...") 対応
   # e2e専用環境だが、
   playwright-real:
     build:
@@ -82,8 +80,6 @@ services:
       - DJANGO_SETTINGS_MODULE=config.settings_fortest
       - DJANGO_ALLOW_ASYNC_UNSAFE=1
       - PYTHONPATH=/app/backend  # ← backend 配下のモジュールをインポート可能に
-    extra_hosts:
-      - "localhost:host-gateway"
     user: "${UID:-1000}:${GID:-1000}"
     # entrypoint: [ "tail", "-f", "/dev/null" ]  # ← デバッグ時に便利
 

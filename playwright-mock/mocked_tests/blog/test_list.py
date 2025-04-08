@@ -56,22 +56,39 @@ def mocked_paginated_response2p():
         "page1": {
             "results": [
                 {"id": 1, "title": "タイトル_1", "contents_text": "ページ1のブログ1"},
-                {"id": 2, "title": "タイトル_2", "contents_text": "ページ1のブログ2"}
+                {"id": 2, "title": "タイトル_2", "contents_text": "ページ1のブログ2"},
+                {"id": 3, "title": "タイトル_3", "contents_text": "ページ1のブログ3"},
+                {"id": 4, "title": "タイトル_4", "contents_text": "ページ1のブログ4"},
+                {"id": 5, "title": "タイトル_5", "contents_text": "ページ1のブログ5"},
+                {"id": 6, "title": "タイトル_6", "contents_text": "ページ1のブログ6"},
+                {"id": 7, "title": "タイトル_7", "contents_text": "ページ1のブログ7"},
+                {"id": 8, "title": "タイトル_8", "contents_text": "ページ1のブログ8"},
+                {"id": 9, "title": "タイトル_9", "contents_text": "ページ1のブログ9"},
+                {"id": 10, "title": "タイトル_10", "contents_text": "ページ1のブログ10"},
             ],
             "current_page": 1,
-            "num_of_items": 4,
+            "num_of_items": 20,
             "num_of_pages": 2,
-            "num_of_items_per_page": 2,
+            "num_of_items_per_page": 10,
         },
         "page2": {
             "results": [
-                {"id": 3, "title": "タイトル_3", "contents_text": "ページ2のブログ1"},
-                {"id": 4, "title": "タイトル_4", "contents_text": "ページ2のブログ2"}
+                
+                {"id": 11, "title": "タイトル_11", "contents_text": "ページ2のブログ1"},
+                {"id": 12, "title": "タイトル_12", "contents_text": "ページ2のブログ2"},
+                {"id": 13, "title": "タイトル_13", "contents_text": "ページ2のブログ3"},
+                {"id": 14, "title": "タイトル_14", "contents_text": "ページ2のブログ4"},
+                {"id": 15, "title": "タイトル_15", "contents_text": "ページ2のブログ5"},
+                {"id": 16, "title": "タイトル_16", "contents_text": "ページ2のブログ6"},
+                {"id": 17, "title": "タイトル_17", "contents_text": "ページ2のブログ7"},
+                {"id": 18, "title": "タイトル_18", "contents_text": "ページ2のブログ8"},
+                {"id": 19, "title": "タイトル_19", "contents_text": "ページ2のブログ9"},
+                {"id": 20, "title": "タイトル_20", "contents_text": "ページ2のブログ10"},
             ],
             "current_page": 2,
-            "num_of_items": 4,
+            "num_of_items": 20,
             "num_of_pages": 2,
-            "num_of_items_per_page": 2,
+            "num_of_items_per_page": 10,
         }
     }
 
@@ -94,19 +111,18 @@ def test_pagination_next_page(page: Page, mocked_paginated_response2p):
     page.route("**/api/v1/blogs/**", handle_route)
 
     page.goto("http://frontend:5173/blogs/")
-    expect(page.get_by_test_id("blog-item")).to_have_count(2)
-    expect(page.locator("text=タイトル_1")).to_be_visible()
-    expect(page.locator("text=タイトル_3")).not_to_be_visible()
-
+    expect(page.get_by_test_id("blog-item")).to_have_count(10)
+    expect(page.get_by_test_id("blog-title-1")).to_be_visible()
+    expect(page.get_by_test_id("blog-title-13")).not_to_be_visible()
+    
     # 「次へ」ボタンをクリック
-    # TODDO: datatestidを使う
     page.get_by_role("button", name="次へ").click()
 
     # 2ページ目のデータが表示されることを確認
-    expect(page.get_by_test_id("blog-item")).to_have_count(2)
-    expect(page.locator("text=タイトル_3")).to_be_visible()
-    expect(page.locator("text=タイトル_1")).not_to_be_visible()
-
+    expect(page.get_by_test_id("blog-item")).to_have_count(10)
+    expect(page.get_by_test_id("blog-title-13")).to_be_visible()
+    expect(page.get_by_test_id("blog-title-1")).not_to_be_visible()
+    
 #-----------
 
 @pytest.fixture

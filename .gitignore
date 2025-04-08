@@ -410,4 +410,6 @@ pyrightconfig.json
 .envs
 # playwrightのvideoとtraceデータの保存先
 playwright-real/e2e_tests/result
+playwright-real/e2e_tests/test-results
 playwright-mock/mocked_tests/result
+playwright-mock/mocked_tests/test-results
