@@ -7,7 +7,7 @@ def test_pagetitle(page):
     # page.content() # <- デバッグ用 playwrightが見ているpageのDOMを全部出力する
     # page.wait_for_selector("text=ブログ一覧")  # ← これで特定の要素が表示されるまで待つことができる(↓のexpectで待つことができるから不要だが)
     
-    expect(page.get_by_test_id("section-title")).to_have_text("ブログ一覧")
+    expect(page.get_by_test_id("bloglist-section-title")).to_have_text("ブログ一覧")
     assert page.locator("text=ブログ一覧").is_visible() # ↑のexpectと.is_visible()以外はやっていることは一緒
 
 
@@ -43,9 +43,9 @@ def test_blog_list_with_mocked_api(page: Page, mocked_blog_api_response):
     page.route("**/api/v1/blogs/**", handle_route)
 
     page.goto("http://frontend:5173/blogs/")
-    expect(page.get_by_test_id("section-title")).to_have_text("ブログ一覧")
-    # expect(page.locator('[data-testid="blog-item"]')).to_have_count(4)
-    expect(page.get_by_test_id("blog-item")).to_have_count(4)
+    expect(page.get_by_test_id("bloglist-section-title")).to_have_text("ブログ一覧")
+    # expect(page.locator('[data-testid="bloglist-blog-item"]')).to_have_count(4)
+    expect(page.get_by_test_id("bloglist-blog-item")).to_have_count(4)
 
 
 #-----------
@@ -111,17 +111,19 @@ def test_pagination_next_page(page: Page, mocked_paginated_response2p):
     page.route("**/api/v1/blogs/**", handle_route)
 
     page.goto("http://frontend:5173/blogs/")
-    expect(page.get_by_test_id("blog-item")).to_have_count(10)
-    expect(page.get_by_test_id("blog-title-1")).to_be_visible()
-    expect(page.get_by_test_id("blog-title-13")).not_to_be_visible()
+    expect(page.get_by_test_id("bloglist-blog-item")).to_have_count(10)
+    expect(page.get_by_test_id("bloglist-blog-title-1")).to_be_visible()
+    expect(page.get_by_test_id("bloglist-blog-title-13")).not_to_be_visible()
     
     # 「次へ」ボタンをクリック
-    page.get_by_role("button", name="次へ").click()
+    # page.get_by_role("button", name="次へ").click()
+    page.get_by_test_id("bloglist-nextpage-btn").click()
+    
 
     # 2ページ目のデータが表示されることを確認
-    expect(page.get_by_test_id("blog-item")).to_have_count(10)
-    expect(page.get_by_test_id("blog-title-13")).to_be_visible()
-    expect(page.get_by_test_id("blog-title-1")).not_to_be_visible()
+    expect(page.get_by_test_id("bloglist-blog-item")).to_have_count(10)
+    expect(page.get_by_test_id("bloglist-blog-title-13")).to_be_visible()
+    expect(page.get_by_test_id("bloglist-blog-title-1")).not_to_be_visible()
     
 #-----------
 
@@ -129,8 +131,8 @@ def test_pagination_next_page(page: Page, mocked_paginated_response2p):
 def blog_detail_response():
     return {
         "id": 1,
-        "title": "モックタイトル",
-        "contents_text": "モック本文",
+        "title": "モックタイトル1",
+        "contents_text": "モック本文1",
         "created": "2025-04-04T12:00:00+09:00"
     }
 
@@ -138,41 +140,56 @@ def blog_detail_response():
 def blog_list_response():
     return {
         "results": [
-            {"id": 1, "title": "モックタイトル", "contents_text": "モック本文"}
+            {"id": 1, "title": "モックタイトル1", "contents_text": "モック本文1"},
+            {"id": 2, "title": "モックタイトル2", "contents_text": "モック本文2"},
+            {"id": 3, "title": "モックタイトル3", "contents_text": "モック本文3"},
+            {"id": 4, "title": "モックタイトル4", "contents_text": "モック本文4"},
+            {"id": 5, "title": "モックタイトル5", "contents_text": "モック本文5"},
+            {"id": 6, "title": "モックタイトル6", "contents_text": "モック本文6"},
+            {"id": 7, "title": "モックタイトル7", "contents_text": "モック本文7"},
+            {"id": 8, "title": "モックタイトル8", "contents_text": "モック本文8"},
+            {"id": 9, "title": "モックタイトル9", "contents_text": "モック本文9"},
+            {"id": 10, "title": "モックタイトル10", "contents_text": "モック本文10"}
         ],
         "current_page": 1,
-        "num_of_items": 1,
+        "num_of_items": 10,
         "num_of_pages": 1,
         "num_of_items_per_page": 10,
     }
 
 def test_blogs_title_click_navigates_to_detail(page: Page, blog_list_response, blog_detail_response):
-    def handle_route(route: Route, request: Request):
-        if "/api/v1/blogs/1/" in request.url:
+    
+    def handle_route_bloglist(route: Route, request: Request):
+        if "/api/v1/blogs/" in request.url:
             route.fulfill(
                 status=200,
                 content_type="application/json",
-                body=str(blog_detail_response).replace("'", '"')
-            )
-        elif "/api/v1/blogs/" in request.url:
-            route.fulfill(
-                status=200,
-                content_type="application/json",
-                body=str(blog_list_response).replace("'", '"')
+                body=str(blog_list_response).replace("'", '"')  # JSONに変換
             )
         else:
             route.continue_()
+    
+    def handle_route_blogretrieve1(route: Route, request: Request):
+        if "/api/v1/blogs/1" in request.url:
+            route.fulfill(
+                status=200,
+                content_type="application/json",
+                body=str(blog_detail_response).replace("'", '"')  # JSONに変換
+            )
+        else:
+            route.continue_()
+    
 
-    page.route("**/api/v1/blogs/**", handle_route)
-
+    page.route("**/api/v1/blogs/**", handle_route_bloglist)
+    page.route("**/api/v1/blogs/1/**", handle_route_blogretrieve1)
     # 一覧ページを開く
     page.goto("http://frontend:5173/blogs/")
-    expect(page.get_by_test_id("blog-title-link")).to_have_text("モックタイトル")
+    expect(page.get_by_test_id("bloglist-blog-title-1")).to_have_text("モックタイトル1")
 
     # タイトルクリックで詳細へ遷移
-    page.get_by_test_id("blog-title-link").click()
+    page.get_by_test_id("bloglist-blog-title-link-1").click()
 
     # 詳細ページの要素が表示されているか確認
-    expect(page.get_by_test_id("blog-title")).to_have_text("モックタイトル")
-    expect(page.get_by_test_id("blog-contents-text")).to_have_text("モック本文")
+    expect(page.get_by_test_id("blogretrive-blog-title")).to_have_text("モックタイトル1")
+    expect(page.get_by_test_id("blogretrive-blog-contents-text")).to_have_text("モック本文1")
     

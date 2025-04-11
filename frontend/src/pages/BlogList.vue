@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto px-4 py-8">
-    <h1 data-testid="section-title" class="text-2xl font-bold mb-4">ブログ一覧</h1>
+    <h1 data-testid="bloglist-section-title" class="text-2xl font-bold mb-4">ブログ一覧</h1>
     <!-- ▶ ドロップダウン：ページサイズ選択 -->
     <div class="mb-4 flex items-center space-x-2">
       <label for="page-size" class="text-sm">1ページに表示する件数：</label>
@@ -17,15 +17,15 @@
     </div>
 
     <!-- ▶ ブログ一覧 -->
-    <div class="space-y-4" data-testid="blogs_container">
+    <div class="space-y-4" data-testid="bloglist-blogs-container">
       <div
         v-for="blog in blogs"
         :key="blog.id"
-        data-testid="blog-item"
+        data-testid="bloglist-blog-item"
         class="p-4 rounded-xl shadow bg-white border"
       >
-      <router-link :to="`/blogs/${blog.id}`" data-testid="blog-title-link">
-        <h2 class="text-lg font-semibold" :data-testid='`blog-title-${blog.id}`'>
+      <router-link :to="`/blogs/${blog.id}`" :data-testid="`bloglist-blog-title-link-${blog.id}`">
+        <h2 class="text-lg font-semibold" :data-testid='`bloglist-blog-title-${blog.id}`'>
           {{ blog.title }}
         </h2>
       </router-link>
@@ -43,7 +43,7 @@
         class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
         @click="currentPage--"
         :disabled="currentPage <= 1"
-        data-testid="blogs-previouspage-btn"
+        data-testid="bloglist-previouspage-btn"
       >
         前へ
       </button>
@@ -54,7 +54,7 @@
         class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
         @click="currentPage++"
         :disabled="currentPage >= totalPages"
-        data-testid="blogs-nextpage-btn"
+        data-testid="bloglist-nextpage-btn"
       >
         次へ
       </button>
