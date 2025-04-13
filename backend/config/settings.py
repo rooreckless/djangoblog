@@ -26,7 +26,16 @@ SECRET_KEY = 'django-insecure-7l58s8yj#fvuit@%93a+2x9=5rs5dgxcf!zj$fd#^3704b-2&%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = バックエンドとして受け付けるホスト。これがないと
+# ↓ほかのsettings.pyでALLOWEDHOSTSが定義済みです。
+# もしALLOWED_HOSTSに共通で追加したいものがあるなら、+=で追加しましょう。
+# https://qiita.com/tag1216/items/416314cc75a099ad6149
+ALLOWED_HOSTS = [
+    "localhost",
+    # "127.0.0.1",
+    "backend",  # ← docker-compose 内でのホスト名 これがないとエラーになる
+    # "frontend", # ← なくてもテストは可能
+]
 
 
 # Application definition
@@ -38,6 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # extensions
+    'django_extensions',
     #↓の2つを追加しapiアプリへのアクセスを可能にして、そのアクセスをブラウザでRestFramework画面で見れるようにする
     "rest_framework",
     "api",

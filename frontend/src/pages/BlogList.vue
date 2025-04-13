@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto px-4 py-8">
-    <h1 data-testid="section-title" class="text-2xl font-bold mb-4">ブログ一覧</h1>
+    <h1 data-testid="bloglist-section-title" class="text-2xl font-bold mb-4">ブログ一覧</h1>
     <!-- ▶ ドロップダウン：ページサイズ選択 -->
     <div class="mb-4 flex items-center space-x-2">
       <label for="page-size" class="text-sm">1ページに表示する件数：</label>
@@ -17,15 +17,15 @@
     </div>
 
     <!-- ▶ ブログ一覧 -->
-    <div class="space-y-4" data-testid="blogs_container">
+    <div class="space-y-4" data-testid="bloglist-blogs-container">
       <div
         v-for="blog in blogs"
         :key="blog.id"
-        data-testid="blog-item"
+        data-testid="bloglist-blog-item"
         class="p-4 rounded-xl shadow bg-white border"
       >
-      <router-link :to="`/blogs/${blog.id}`" data-testid="blog-title-link">
-        <h2 class="text-lg font-semibold">
+      <router-link :to="`/blogs/${blog.id}`" :data-testid="`bloglist-blog-title-link-${blog.id}`">
+        <h2 class="text-lg font-semibold" :data-testid='`bloglist-blog-title-${blog.id}`'>
           {{ blog.title }}
         </h2>
       </router-link>
@@ -43,6 +43,7 @@
         class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
         @click="currentPage--"
         :disabled="currentPage <= 1"
+        data-testid="bloglist-previouspage-btn"
       >
         前へ
       </button>
@@ -53,6 +54,7 @@
         class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
         @click="currentPage++"
         :disabled="currentPage >= totalPages"
+        data-testid="bloglist-nextpage-btn"
       >
         次へ
       </button>
@@ -65,7 +67,7 @@
   import { ref, onMounted, watch } from "vue";
   import moment from "moment"
 
-  
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
   const blogs = ref([]);
   const currentPage = ref(1);
   const pageSize = ref(10);
@@ -73,16 +75,20 @@
 
   
   const getBlogLists = async ()=>{
-    // const response = await fetch("http://localhost:8000/api/v1/blogs/");
-    const response = await fetch(`http://localhost:8000/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
-    // const response = await fetch(`http://backend:8000/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
-    let results=await response.json();
-    blogs.value = results["results"];
-    totalPages.value = results["num_of_pages"];
+    try {
+      const response = await fetch(`${baseURL}/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
+      const results = await response.json();
+      blogs.value = results["results"];
+      totalPages.value = Math.ceil(results["num_of_items"] /pageSize.value);
+    } catch (error) {
+      console.error("Error fetching blogs:", error);
+    }
   };
+
 
   
   const init = async ()=>{
+    
     await getBlogLists();
   };
     onMounted(() => {
@@ -90,8 +96,9 @@
 
   });
     
-  watch([currentPage, pageSize], () => {
-    getBlogLists();
+  watch([currentPage, pageSize],async () => {
+    totalPages.value = Math.ceil(blogs.value.length/pageSize.value);
+    await getBlogLists();
   });
 
 </script>

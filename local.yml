@@ -49,6 +49,8 @@ services:
     working_dir: /app  # コンテナを起動した後の、コンテナ内での作業ディレクトリ commandやentrypointはこのディレクトリを基準とする
     image: djangoblog_local_frontend_img  # ビルド後のイメージ名
     container_name: djangoblog_local_frontend  # 起動するコンテナの名前（任意）
+    env_file:
+      - ./.envs/local/frontend
     volumes:
       - ./frontend:/app  # ホストの ./frontend をコンテナの /app にマウント（コード変更が即反映される）
       - node_modules:/app/node_modules  # node_modules はボリュームで分離（ホストと衝突を避ける）ただしこのディレクトリはroot所有者になる。
@@ -69,6 +71,7 @@ services:
       - backend
       - frontend
     working_dir: /app
+    user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - ./playwright-mock:/app  # ← テストケースファイルはこの中のe2e_testsディレクトリだが、test_resultsもここに作成される
     # entrypoint: [ "tail", "-f", "/dev/null" ]  # デバッグ用。任意で変更可。

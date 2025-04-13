@@ -1,15 +1,18 @@
-import os
-import django
-import pytest
+#----------
+# e2eテスト時は、djangoblogDBをそのまま使う(pytest-djangoによる「test_~なDBの自動作成」にたよらない)
+# なので「このファイルでフィクスチャを使ってテスト前データ準備する」としても「apiを叩いてデータを準備する」などのやり方になる。
+# playwright-realコンテナではbackendのソースコードをマウントしないので、djangoのORMが使えないからです
+#----------
+# import os
+# import django
+# import pytest
 
-# Django を初期化
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings_fortest")
-django.setup()
-
-from api.tests.factories.blogFactory import BlogFactory
-
-@pytest.fixture
-def create_sample_blogs():
-    def _create(count=4):
-        return BlogFactory.create_batch(count)
-    return _create
+# @pytest.fixture
+# def create_sample_blogs():
+# ↓の内容そのものは使えないけど、フィクスチャとして定義の仕方としてはこの通り
+#     def _create(count=1):
+#         blogs = BlogFactory.create_batch(count)
+#         # このフィクスチャをお使った場合のファクトリによって作成されたブログの件数を書くにする
+#         # print("Blog.objects.all().count()=", Blog.objects.all().count())  # デバッグ用
+#         return blogs
+#     return _create

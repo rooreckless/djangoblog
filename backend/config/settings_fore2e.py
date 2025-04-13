@@ -1,4 +1,4 @@
-# backend/config/settings_fortest.py
+# backend/config/settings_fore2e.py
 # テスト用の設定ファイル(settings.pyの内容も使ったうえで、上書き分や追加分が記述されている)
 
 from .settings import *  # 全体の共通設定を引き継ぐ
@@ -19,19 +19,19 @@ TEST_RUNNER = "django.test.runner.DiscoverRunner"
 # テンプレートデバッグ有効化（エラー表示が分かりやすく）
 TEMPLATES[0]["OPTIONS"]["debug"] = True  # type: ignore
 
-# # テスト用DB名を明示的に設定
-# DATABASES["default"]["TEST"] = {
-#     "NAME": "test_djangoblog",
-#     # NAMEが開発用のdjangoblogと同じだと、テスト実行後に全レコードがきえる。
-#     # ローカルでのテスト(バックエンドでの単体テスト、フロントでのユニットテストやmockありplaywrightテスト)だと困るので指定。
-#     "MIRROR": None,
-#     "DEPENDENCIES": [],
-#     "SERIALIZE": False,
-#     "CREATE_DB": False,  # ← これが重要！
-# }
+# テスト用DB名を明示的に設定
+DATABASES["default"]["TEST"] = {
+    # "NAME": "test_djangoblog",
+    # NAMEが開発用のdjangoblogと同じだと、テスト実行後に全レコードがきえる。が、e2eテスト用だと割り切ればokか。
+    "NAME": "djangoblog",
+    "MIRROR": None,
+    "DEPENDENCIES": [],
+    "SERIALIZE": False,
+    "CREATE_DB": False,  # ← これが重要！pytest-djangoによる「test~なDB名」が作成されないようにする
+}
 
-# まだこのファイルを使う場合はCORSとして通すORIGINは全部
-CORS_ALLOWED_ORIGINS = ["http://frontend:5173"] # バックエンドへのテストができない
+# バックエンドが受け付けるのは、同じdocker-compose内のfrontendサービスコンテナからのリクエストだけ受け付ける
+CORS_ALLOWED_ORIGINS = ["http://frontend:5173"] 
 # CORS_ALLOW_ALL_ORIGINS = True # ←デバッグ用
 # # バックエンドとして受け付けるホスト。これがないと
 # ALLOWED_HOSTS = [
@@ -41,6 +41,6 @@ CORS_ALLOWED_ORIGINS = ["http://frontend:5173"] # バックエンドへのテス
 #     # "frontend", # ← なくてもテストは可能
 # ]
 
-# このsettingsで使うDB名を確認するため使う
+# 「このsettingsから起動するバックエンドが使うDB名」を確認するため使う e2e環境なので「test_djangoblog」だとダメ。「djangoblog」のはず
 # print("[settings_fortest] POSTGRES_DB =", os.environ.get("POSTGRES_DB"))
 # print("[settings_fortest] NAME =", DATABASES["default"]["NAME"])
