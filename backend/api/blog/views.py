@@ -1,8 +1,9 @@
 from rest_framework import viewsets
 from api.models.blogs import Blog
+from rest_framework import status
 from api.pagination import ListPagination
 from rest_framework.exceptions import NotFound
-from .serializers import BlogRequestSerializer, BlogResponseSerializer
+from .serializers import BlogRequestSerializer, BlogResponseSerializer, BlogCreateRequestSerializer
 from rest_framework.response import Response
 from api.serializers import ValidationErrorResponseSerializer
 from api.blog.query import BlogQueryService
@@ -12,7 +13,9 @@ from drf_spectacular.utils import extend_schema
 class BlogViewSet(viewsets.GenericViewSet):
     # GenericViewset以外にModelViewSetを使うこともありだが、違いは https://qiita.com/usayamadausako/items/be70a57a6d24d20a05e3
     pagination_class = ListPagination
-
+    # 以下のserializer_classに指定したシリアライザを必ずしも使うとは限らないけれど、定義しとかないとDRF的にはエラーなので実施
+    # 【理由】このBlogViewSetクラスではlistやcreateメソッドなどで、直接シリアライザを扱うことにしているから。
+    serializer_class = BlogResponseSerializer
     def get_queryset(self):
         """
         DRFの内部メソッドで使用されるが、今回は未使用。
@@ -91,7 +94,18 @@ class BlogViewSet(viewsets.GenericViewSet):
         serializer = BlogResponseSerializer(blog)
         return Response(serializer.data)
     
-
+    def create(self, request, *args, **kwargs):
+        # TODO: 今のところブログ作成機能はview、serializer含めかなり記述量がすくない。
+        # しかし、①ログインしたユーザーのみ作成許可や、②同じタイトルをつけることができないようにする場合
+        # ③タグ機能など、他モデルとの連携でトランザクションデータにしないといけない場合
+        # ④作成のため使うシリアライザにhelp_textやlabel、exampleをつける場合
+        # などを考慮する場合があるかも
+        serializer = BlogCreateRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        blog = Blog.objects.create(**serializer.validated_data)
+        response_serializer = BlogResponseSerializer(blog)
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 # ---viewsets.GenericViewを継承したクラスの中で、「その変数に値を入れることに意味が出てくる」もの----
 # https://www.cdrf.co/
 # https://www.cdrf.co/3.14/rest_framework.viewsets/GenericViewSet.html
@@ -132,3 +146,9 @@ class BlogViewSet(viewsets.GenericViewSet):
 # ->(この変数を使わない場合settingsの REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"]に依存する)
 
 # viewsets.GenericAPIViewを継承したクラスベースビューは、CRUDの内1つだけ実装した場合(ヘルスチェック用とか)の場合につかう。
+# viewsets.ModelViewSetを継承したクラスベースビューは、CRUDの全てを実装した場合につかう。
+
+# ---viewsets.GenericViewを継承したクラスの中で、「その変数に値を入れることに意味が出てくる」もの----
+
+
+    
