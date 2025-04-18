@@ -5,13 +5,18 @@ const routes = [
   {
     path: '/blogs',
     name: 'BlogList',
-    component: () => import('@/pages/BlogList.vue'), // 後ほど作成
+    component: () => import('@/pages/BlogList.vue'),
   },
   {
     path: '/blogs/:id',
     name: 'BlogDetail',
-    component: () => import('@/pages/BlogDetail.vue'), // 後ほど作成
+    component: () => import('@/pages/BlogDetail.vue'), 
   },
+  {
+    path: "/blogs/create",
+    name: "BlogCreate",
+    component: () => import('@/pages/BlogCreate.vue'),
+  }
 ]
 // main.tsでよみこむrouter(はcreateRouterオブジェクト)
 const router = createRouter({

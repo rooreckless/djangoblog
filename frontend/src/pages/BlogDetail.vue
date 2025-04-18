@@ -1,11 +1,11 @@
 <!-- src/pages/BlogDetail.vue -->
 <template>
-  <div class="p-4">
+  <div class="container mx-auto px-4 py-8">
     <h1 class="text-2xl font-bold mb-4">ブログ詳細</h1>
     <div v-if="blog">
-      <h2 class="text-xl font-semibold" data-testid="blogretrive-blog-title">{{ blog.title }}</h2>
+      <h2 class="mb-2 p-4 rounded-xl shadow bg-white bordertext-xl font-semibold w-full" data-testid="blogretrive-blog-title">{{ blog.title }}</h2>
       <p class="text-gray-600 text-sm mb-2">投稿日: {{ blog.created }}</p>
-      <p  data-testid="blogretrive-blog-contents-text">{{ blog.contents_text }}</p>
+      <p  data-testid="blogretrive-blog-contents-text" class ="w-full p-4 rounded-xl">{{ blog.contents_text }}</p>
     </div>
     <div v-else>
       ロード中...
