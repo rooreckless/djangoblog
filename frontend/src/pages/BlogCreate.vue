@@ -32,7 +32,7 @@
         </div>
         
     </form>
-    <!-- <p v-if="errorMessage" class="error">{{ errorMessage }}</p> -->
+    <p v-if="errorMessage" data-testid="blogcreate-backend-error-message" class="error">{{ errorMessage }}</p>
 </div>
 </template>
   
@@ -66,7 +66,7 @@ const { handleSubmit, errors :form_errors } = useForm({
 // {value: title}のtitleは、v-modelで使用できるようになる。useField('title')の方はschemaｍのyup.objectに入れたオブジェクトのことを指す
 const { value: title} = useField('title')
 const { value: contents_text} = useField('contents_text')
-
+// useFieldで定義しているので、v-modelで双方バインディングする変数は作成しなくていい。
 // const title = ref("")
 // const contentsText = ref("")
 const errorMessage = ref("")
