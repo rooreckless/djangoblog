@@ -91,9 +91,15 @@ const submitBlog = handleSubmit (async (form_values) => {
         })
 
         if (!response.ok) {
-            const errorData = await response.json()
-            errorMessage.value = errorData?.detail || "作成に失敗しました"
-            return
+            const errorData = await response.json();
+            
+            if (errorData.detail) {
+                errorMessage.value = errorData.detail;
+            } else {
+                // 複数フィールドのバリデーションエラーをまとめて表示する例（必要に応じて整形）
+                errorMessage.value = Object.values(errorData).flat().join("／");
+            }
+            return;
         }
 
         // 成功時は一覧ページにリダイレクト（必要に応じて）

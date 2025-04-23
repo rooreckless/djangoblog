@@ -93,7 +93,10 @@ class BlogViewSet(viewsets.GenericViewSet):
 
         serializer = BlogResponseSerializer(blog)
         return Response(serializer.data)
-    
+    # def create(self, request, *args, **kwargs):
+    # # このメソッドは意図的に500エラーを発生させるために使っていました。今後は使わない
+    #     raise Exception("意図的な500 Internal Server Error")
+
     def create(self, request, *args, **kwargs):
         # TODO: 今のところブログ作成機能はview、serializer含めかなり記述量がすくない。
         # しかし、①ログインしたユーザーのみ作成許可や、②同じタイトルをつけることができないようにする場合
