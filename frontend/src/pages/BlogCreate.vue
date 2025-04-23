@@ -25,10 +25,19 @@
             戻る
             </button>
 
-            <button type="submit" data-testid="blogcreate-submit-btn" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300">
             <!-- 作成ボタン このボタンが押されることでsubmitイベントが発火 = formタグは「submitイベント発火時はsubmitBlog実施」状態になっているのでバックエンドへPOSTリクエストされる -->
+            <button
+                type="submit"
+                :disabled="!isFormValid"
+                :class="[
+                    'px-4 py-2 rounded',
+                    isFormValid ? 'bg-sky-400 hover:bg-gray-300' : 'bg-gray-100 cursor-not-allowed',
+                ]"
+                data-testid="blogcreate-submit-btn"
+                >
                 作成
             </button>
+
         </div>
         
     </form>
@@ -38,7 +47,7 @@
   
 
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, computed } from "vue"
 import { useRouter } from "vue-router"
 import { useForm, useField } from 'vee-validate'
 import * as yup from 'yup'
@@ -115,10 +124,17 @@ const submitBlog = handleSubmit (async (form_values) => {
 
 );
 
+// methods
+
 const backBlogListPage = ()=>{
   console.log("--戻るボタン--")
   router.push('/blogs')  // 一覧画面に戻る
 };
+
+// computed
+const isFormValid = computed(() => {
+  return title.value && contents_text.value
+})
 
 </script>
 
