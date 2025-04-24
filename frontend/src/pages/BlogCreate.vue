@@ -22,8 +22,10 @@
             data-testid="blogcreate-back-btn"
             >
             <!-- 戻るボタン -->
-            戻る
+            戻る!!
             </button>
+            <!-- こっちの戻るボタンは共通コンポーネントのもの -->
+            <BackToBlogListButton />
 
             <!-- 作成ボタン このボタンが押されることでsubmitイベントが発火 = formタグは「submitイベント発火時はsubmitBlog実施」状態になっているのでバックエンドへPOSTリクエストされる -->
             <button
@@ -51,6 +53,8 @@ import { ref, computed } from "vue"
 import { useRouter } from "vue-router"
 import { useForm, useField } from 'vee-validate'
 import * as yup from 'yup'
+// 共通コンポーネントである「戻るボタン」をインポート
+import BackToBlogListButton from '@/components/BackToBlogListButton.vue'
 
 // スキーマ定義=フォーム内パーツのバリデーションルールを定義し、yup ライブラリを使用してスキーマを作成
 // titleについては、必須項目であること、最大文字数200文字であることを指定
