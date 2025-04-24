@@ -21,7 +21,9 @@ describe('AppTrasitionPageButton', () => {
     const wrapper = mount(AppTrasitionPageButton, {
       props: {
         to: '/dashboard',   // ボタンクリック時に遷移してほしいパス(このテスト用)
-        text: '戻るよ',     // ボタンに表示するテキスト
+      },
+      slots: {
+        default: '戻るよ',  // スロットに渡す内容=ボタンの表示テキスト（デフォルトスロット）propsで渡すのではない
       },
       attrs: {
         'data-testid': 'test-back-btn', // テストでボタンを識別するための属性(props ではなく attrs で渡す)

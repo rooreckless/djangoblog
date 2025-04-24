@@ -25,8 +25,9 @@
             戻る!!!
             </button>
             <!-- こっちの戻るボタンは共通コンポーネントのもの -->
-            <AppTrasitionPageButton to="/blogs" text="ブログ一覧画面へ戻る" data-testid="blogcreate-back-btn"/>
-            <!-- <AppTrasitionPageButton/> -->
+            <AppTrasitionPageButton to="/blogs" data-testid="blogcreate-back-btn">
+                ブログ一覧画面へ戻る
+            </AppTrasitionPageButton>
 
             <!-- 作成ボタン このボタンが押されることでsubmitイベントが発火 = formタグは「submitイベント発火時はsubmitBlog実施」状態になっているのでバックエンドへPOSTリクエストされる -->
             <button

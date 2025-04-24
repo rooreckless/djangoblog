@@ -10,7 +10,8 @@
     ]"
     v-bind="$attrs"
   >
-    {{ text }}
+    <!-- テキストは props ではなく slot から渡すようにする -->
+    <slot>戻る</slot> <!-- slot が空だった場合のデフォルト値も指定可能 -->
   </button>
 </template>
 <script setup lang="ts">
@@ -25,11 +26,8 @@ import { defineProps,withDefaults } from 'vue'
 // 特にdatatestidはpropsで渡すことができないのでattrsで受け取るようにしています。
 const props = withDefaults(defineProps<{
   to?: string
-  text?: string
-  
 }>(), {
   to: '/blogs',
-  text: '戻る',
 })
 
 const router = useRouter()
