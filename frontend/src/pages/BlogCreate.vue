@@ -127,14 +127,20 @@ const submitBlog = handleSubmit (async (form_values) => {
 // methods
 
 const backBlogListPage = ()=>{
-  console.log("--戻るボタン--")
-  router.push('/blogs')  // 一覧画面に戻る
+    console.log("--戻るボタン--")
+    router.push('/blogs')  // 一覧画面に戻る
 };
 
 // computed
+// フォーム内の要素に値が入っている = 必須入力項目に値が入っているかどうかを算出する
 const isFormValid = computed(() => {
-  return title.value && contents_text.value
+    // isFormValidの値は、入力欄のtitleとcontents_textの双方に値が入っているなら、Trueになる。
+    // Trueになると、作成ボタンには:disabled="!isFormValid"が記述されているので、作成ボタンが押せるようになる
+    return title.value && contents_text.value
 })
+
+// - フロントエンドのcomputedは、ユーザーの画面操作によって「画面描画にのみ」影響を及ぼしたい場合使う(例:フロントバリデーションエラーなら、ボタンをdisabledで押せなくする、や、色を変える、など)
+// - 一方、ref + watchは、ユーザーの画面操作によって「他の内部処理を実行したり、apiへリクエストを行ったりする必要がある」場合に使う(例:フロントの検索欄に、1文字入力するたびに、バックエンドへ検索を行う(=インクリメンタルサーチ)や、ログ出力など)
 
 </script>
 
