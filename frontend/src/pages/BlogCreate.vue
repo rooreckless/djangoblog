@@ -14,17 +14,8 @@
         <!-- ↓のtextareaに入れられた文字は v-modelに指定した変数に入る -->
         <textarea data-testid="blogcreate-textarea-contents-text" class="mb-2 p-4 rounded-xl shadow bg-white border w-full" v-model="contents_text" placeholder="本文"/>
         <p v-if="form_errors.contents_text" class="text-red-500" data-testid="blogcreate-textarea-contents-text-error">{{ form_errors.contents_text }}</p>
-        <div class="mt-6 mx-4 flex justify-between items-center space-x-4">
-            <button
-            type="button"
-            class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
-            @click="backBlogListPage"
-            data-testid="blogcreate-back-btn"
-            >
+        <div class="mt-6 mx-4 flex justify-between items-center space-x-4">   
             <!-- 戻るボタン -->
-            戻る!!!
-            </button>
-            <!-- こっちの戻るボタンは共通コンポーネントのもの -->
             <AppTrasitionPageButton to="/blogs" data-testid="blogcreate-back-btn">
                 ブログ一覧画面へ戻る
             </AppTrasitionPageButton>
