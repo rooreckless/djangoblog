@@ -14,16 +14,11 @@
         <!-- ↓のtextareaに入れられた文字は v-modelに指定した変数に入る -->
         <textarea data-testid="blogcreate-textarea-contents-text" class="mb-2 p-4 rounded-xl shadow bg-white border w-full" v-model="contents_text" placeholder="本文"/>
         <p v-if="form_errors.contents_text" class="text-red-500" data-testid="blogcreate-textarea-contents-text-error">{{ form_errors.contents_text }}</p>
-        <div class="mt-6 mx-4 flex justify-between items-center space-x-4">
-            <button
-            type="button"
-            class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
-            @click="backBlogListPage"
-            data-testid="blogcreate-back-btn"
-            >
+        <div class="mt-6 mx-4 flex justify-between items-center space-x-4">   
             <!-- 戻るボタン -->
-            戻る
-            </button>
+            <AppTrasitionPageButton to="/blogs" data-testid="blogcreate-back-btn">
+                ブログ一覧画面へ戻る
+            </AppTrasitionPageButton>
 
             <!-- 作成ボタン このボタンが押されることでsubmitイベントが発火 = formタグは「submitイベント発火時はsubmitBlog実施」状態になっているのでバックエンドへPOSTリクエストされる -->
             <button
@@ -51,6 +46,8 @@ import { ref, computed } from "vue"
 import { useRouter } from "vue-router"
 import { useForm, useField } from 'vee-validate'
 import * as yup from 'yup'
+// 共通コンポーネントである「遷移ボタン」をインポート
+import AppTrasitionPageButton from '@/components/AppTrasitionPageButton.vue'
 
 // スキーマ定義=フォーム内パーツのバリデーションルールを定義し、yup ライブラリを使用してスキーマを作成
 // titleについては、必須項目であること、最大文字数200文字であることを指定

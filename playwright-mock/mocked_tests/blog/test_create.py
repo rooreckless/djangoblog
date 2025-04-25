@@ -117,37 +117,10 @@ def test_blog_create_with_invalid_input(page: Page):
     page.route("**/api/v1/blogs/", handle_blog_create_invalid_input)
     page.goto("http://frontend:5173/blogs/create")
 
-    # 何も入力せずに送信ボタンをクリック ← ブログ作成はされないはず
-    page.get_by_test_id("blogcreate-submit-btn").click()
+    # 何も入力しない状態だと送信ボタンをクリックできないはず
+    # page.get_by_test_id("blogcreate-submit-btn").click()
+    expect( page.get_by_test_id("blogcreate-submit-btn")).to_be_disabled()
 
-    # バリデーションエラーになるはずなので、メッセージがでているかの検証
-    expect(page.get_by_test_id("blogcreate-input-title-error")).to_be_visible()
-    expect(page.get_by_test_id("blogcreate-textarea-contents-text-error")).to_be_visible()
-    # エラーメッセージの内容を検証
-    expect(page.get_by_test_id("blogcreate-input-title-error")).to_have_text("タイトルは必須です")
-    expect(page.get_by_test_id("blogcreate-textarea-contents-text-error")).to_have_text("本文は必須です")
-
-
-def test_blog_create_no_request_if_invalid_input(page: Page):
-    """バリデーションエラー タイトル、本文ともに入力しないでブログ作成ボタンを押しても、fetchリクエスト自体が送信されないことを確認する"""
-    page.route("**/api/v1/blogs/", handle_blog_create_invalid_input)
-    page.goto("http://frontend:5173/blogs/create")
-
-    # タイトルや本文を入力しない（＝バリデーションNG）
-    page.get_by_test_id("blogcreate-input-title").fill("")
-    page.get_by_test_id("blogcreate-textarea-contents-text").fill("")    
-
-    # バックエンドへのfetchリクエストが送られないことを確認
-    with pytest.raises(TimeoutError):
-        with page.expect_request("**/api/v1/blogs/", timeout=1000):
-            # ここの部分ではas request_infoを使うことはできない
-            # ↓で作成ボタンを押しても、フロントバリデーションエラーが発生中はボタンを押してもリクエストが発生しないから。
-            page.get_by_test_id("blogcreate-submit-btn").click()
-
-    
-    # バリデーションエラーが表示されることを確認
-    expect(page.get_by_text("タイトルは必須です")).to_be_visible()
-    expect(page.get_by_text("本文は必須です")).to_be_visible()
 
 def test_create_blog_with_title_too_long(page: Page):
     """バリデーションエラー タイトルの文字列が長すぎる場合"""

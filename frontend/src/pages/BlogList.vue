@@ -2,7 +2,8 @@
   <div class="container mx-auto px-4 py-8">
     <h1 data-testid="bloglist-section-title" class="text-2xl font-bold mb-4">ブログ一覧</h1>
     <!-- ▶ ドロップダウン：ページサイズ選択 -->
-    <div class="mb-4 flex items-center space-x-2">
+    <div class="mb-4 flex items-center space-x-2 justify-around">
+      <div>
       <label for="page-size" class="text-sm">1ページに表示する件数：</label>
       <select
         id="page-size"
@@ -14,6 +15,11 @@
         <option :value="20">20件</option>
         <option :value="50">50件</option>
       </select>
+      </div>
+      <!-- ブログ作成画面への遷移ボタン -->
+      <AppTrasitionPageButton to="/blogs/create" data-testid="bloglist-transition-blogcreate-btn">
+          ブログ作成画面へ
+      </AppTrasitionPageButton>
     </div>
 
     <!-- ▶ ブログ一覧 -->
@@ -66,7 +72,9 @@
 <script setup lang="ts">
   import { ref, onMounted, watch } from "vue";
   import moment from "moment"
-
+  // 共通コンポーネントである「遷移ボタン」をインポート
+  import AppTrasitionPageButton from '@/components/AppTrasitionPageButton.vue'
+ 
   const baseURL = import.meta.env.VITE_API_BASE_URL;
   const blogs = ref([]);
   const currentPage = ref(1);
