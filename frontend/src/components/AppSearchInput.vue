@@ -8,11 +8,13 @@
             @keydown.enter="submitSearch"
             class="border px-3 py-2 rounded w-full"
             :placeholder="placeholder"
+            :data-testid="`${props.dataTestid}-input`"
         />
         <!-- 検索ボタン。クリック時にsubmitSearch関数を実行 -->
         <button
             @click="submitSearch"
             class="px-4 py-2 rounded bg-sky-400 text-white hover:bg-sky-500"
+            :data-testid="`${props.dataTestid}-btn`"
         >
         検索
         </button>
@@ -20,12 +22,18 @@
 </template>
   
 <script setup lang="ts">
-import { ref, defineEmits, defineProps } from 'vue'
-// 親コンポーネントで受け取るpropsとしては、入力欄のplaceholder
-const props = defineProps<{
-    placeholder?: string
-}>()
+import { ref, defineEmits, defineProps,withDefaults } from 'vue'
+import { computed } from 'vue'
+// 親コンポーネントで受け取るpropsとしては、入力欄のplaceholderとdateTestid
 
+const props = withDefaults(defineProps<{
+    placeholder?: string,
+    dataTestid: string  // ← シングルクォートで囲って定義できる（ハイフンを含む名前だから）
+}>(), {
+    // 個々に記述しているのはデフォルト値(変数名にシングルクォートを使う場合についても一緒)
+    placeholder: '検索',
+    dataTestid: 'search-bar'
+})
 
 // emitは、Vueのコンポーネントから親コンポーネントにイベントを発火するためのもの
 // このコンポーネントは "search" イベントを親に向けて発行する。発行した際、親に渡す値の型はstring型=検索文字列

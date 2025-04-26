@@ -17,7 +17,7 @@
         </select>
       </div>
       <!-- 共通コンポーネントのブログ検索欄 searchイベント発生時にはhandleSearchを実行する-->
-      <AppSearchInput placeholder="検索" @search="handleSearch"/>
+      <AppSearchInput placeholder="検索" @search="handleSearch" dataTestid="bloglist-search"/>
       <!-- ブログ作成画面への遷移ボタン -->
       <AppTrasitionPageButton to="/blogs/create" data-testid="bloglist-transition-blogcreate-btn">
           ブログ作成画面へ
