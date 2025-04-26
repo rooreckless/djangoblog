@@ -74,10 +74,7 @@
 <script setup lang="ts">
   import { ref, onMounted, watch } from "vue";
   import moment from "moment"
-  // 共通コンポーネント
-  import AppTrasitionPageButton from '@/components/AppTrasitionPageButton.vue'
-  import AppSearchInput from '@/components/AppSearchInput.vue'
- 
+   
   const baseURL = import.meta.env.VITE_API_BASE_URL;
   const blogs = ref([]);
   const searchword = ref("");
