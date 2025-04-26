@@ -4,18 +4,20 @@
     <!-- ▶ ドロップダウン：ページサイズ選択 -->
     <div class="mb-4 flex items-center space-x-2 justify-around">
       <div>
-      <label for="page-size" class="text-sm">1ページに表示する件数：</label>
-      <select
-        id="page-size"
-        v-model="pageSize"
-        class="border rounded px-2 py-1"
-      >
-        <option :value="5">5件</option>
-        <option :value="10">10件</option>
-        <option :value="20">20件</option>
-        <option :value="50">50件</option>
-      </select>
+        <label for="page-size" class="text-sm">1ページに表示する件数：</label>
+        <select
+          id="page-size"
+          v-model="pageSize"
+          class="border rounded px-2 py-1"
+        >
+          <option :value="5">5件</option>
+          <option :value="10">10件</option>
+          <option :value="20">20件</option>
+          <option :value="50">50件</option>
+        </select>
       </div>
+      <!-- 共通コンポーネントのブログ検索欄 searchイベント発生時にはhandleSearchを実行する-->
+      <AppSearchInput placeholder="検索" @search="handleSearch"/>
       <!-- ブログ作成画面への遷移ボタン -->
       <AppTrasitionPageButton to="/blogs/create" data-testid="bloglist-transition-blogcreate-btn">
           ブログ作成画面へ
@@ -72,41 +74,57 @@
 <script setup lang="ts">
   import { ref, onMounted, watch } from "vue";
   import moment from "moment"
-  // 共通コンポーネントである「遷移ボタン」をインポート
+  // 共通コンポーネント
   import AppTrasitionPageButton from '@/components/AppTrasitionPageButton.vue'
+  import AppSearchInput from '@/components/AppSearchInput.vue'
  
   const baseURL = import.meta.env.VITE_API_BASE_URL;
   const blogs = ref([]);
+  const searchword = ref("");
   const currentPage = ref(1);
   const pageSize = ref(10);
   const totalPages = ref(1);
 
-  
+  // methods  
   const getBlogLists = async ()=>{
     try {
       const response = await fetch(`${baseURL}/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
-      const results = await response.json();
-      blogs.value = results["results"];
-      totalPages.value = Math.ceil(results["num_of_items"] /pageSize.value);
+      const responseBody = await response.json();
+      blogs.value = responseBody["results"];
+      totalPages.value = Math.ceil(responseBody["num_of_items"] /pageSize.value);
     } catch (error) {
       console.error("Error fetching blogs:", error);
     }
   };
+  // 共通コンポーネント
+  // emitで発火したイベントによって実行する関数
+  // 引数valueはemit になっているもう一つの引数
+  const handleSearch = async (value: string) => {
+    // console.log("検索キーワード:", value);
+    searchword.value = value;
+    // 検索キーワードを使ってブログリストを取得するAPIを呼び出す
+    const response = await fetch(`${baseURL}/api/v1/blogs/?title=${value}&page=${currentPage.value}&size=${pageSize.value}`);
+    const responseBody = await response.json();
+    blogs.value = responseBody["results"];
+    totalPages.value = Math.ceil(responseBody["num_of_items"]/pageSize.value);
+    return;
+  }
 
-
-  
+  // init
   const init = async ()=>{
     
     await getBlogLists();
   };
-    onMounted(() => {
+
+  // onMounted
+  onMounted(() => {
         init();
 
   });
-    
+  // watch
   watch([currentPage, pageSize],async () => {
     totalPages.value = Math.ceil(blogs.value.length/pageSize.value);
-    await getBlogLists();
+    await handleSearch(searchword.value);
   });
 
 </script>
