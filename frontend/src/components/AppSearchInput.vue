@@ -22,8 +22,8 @@
 </template>
   
 <script setup lang="ts">
-import { ref, defineEmits, defineProps,withDefaults } from 'vue'
-import { computed } from 'vue'
+// defineEmits, defineProps,withDefaultsはvueからimportしなくてもいいようになっている
+import { ref } from 'vue'
 // 親コンポーネントで受け取るpropsとしては、入力欄のplaceholderとdateTestid
 
 const props = withDefaults(defineProps<{

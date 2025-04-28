@@ -6,13 +6,30 @@ import { describe, test, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 // テスト対象のブログ作成画面の Vue コンポーネント。
 import BlogCreate from '@/pages/BlogCreate.vue'
+import { createRouter, createWebHistory } from 'vue-router'
+// vitestでは、main.tsが読み込まれないので共通コンポーネントをインポート
+import AppTrasitionPageButton from '@/components/AppTrasitionPageButton.vue'
+// 以下を用意して、BlogCreate.vueをマウントする時にpluginとして渡さないと、警告がでる
+const router = createRouter({
+    history: createWebHistory(),  // HTML5の履歴モード
+    routes: [
+      { path: '/', component: { template: '<div>Home</div>' } }
+    ] // テストでは実際のルートは必要ない（ルーティング自体はしないので）
+})
 
 // 以下describeが、その中野testをまとめるためのもの。
 describe('BlogCreate.vue - 作成ボタンの状態制御', () => {
     // testは、テストケースを定義するための関数。
     test('フォームが有効なとき、作成ボタンは有効化されスタイルが変わる', async () => {
         //BlogCreate.vue をマウント（仮想DOMに展開）し、wrapper オブジェクトを取得。
-        const wrapper = mount(BlogCreate)
+        const wrapper = mount(BlogCreate, {
+            global: {
+                plugins: [router],
+                components: {
+                    AppTrasitionPageButton,
+                },
+            },
+          })
         // ボタン要素を取得　data-testid を使って「作成」ボタン要素を、全体DOMのwrapperから取得。
         const submitBtn = wrapper.get('[data-testid="blogcreate-submit-btn"]')
         // フィールドに入力をしていない状態だと、作成ボタンは灰色で押せないはず

@@ -4,7 +4,12 @@ import AppSearchInput from '@/components/AppSearchInput.vue' // ←ファイル�
 
 describe('AppSearchInput.vue', () => {
   test('初期状態では入力欄は空文字', () => {
-    const wrapper = mount(AppSearchInput)
+    const wrapper = mount(AppSearchInput,{
+      props: {
+        placeholder: 'キーワードを入力してください',
+        dataTestid: 'test-search',
+      },
+    })
 
     const input = wrapper.get('input')
     expect((input.element as HTMLInputElement).value).toBe('')
@@ -14,6 +19,7 @@ describe('AppSearchInput.vue', () => {
     const wrapper = mount(AppSearchInput, {
       props: {
         placeholder: 'キーワードを入力してください',
+        dataTestid: 'test-search',
       },
     })
 
@@ -22,7 +28,12 @@ describe('AppSearchInput.vue', () => {
   })
 
   test('入力するとv-modelが反映される', async () => {
-    const wrapper = mount(AppSearchInput)
+    const wrapper = mount(AppSearchInput,{
+      props: {
+        placeholder: 'キーワードを入力してください',
+        dataTestid: 'test-search',
+      },
+    })
 
     const input = wrapper.get('input')
     await input.setValue('Vue3テスト')
@@ -32,7 +43,12 @@ describe('AppSearchInput.vue', () => {
   })
 
   test('ボタンをクリックするとsearchイベントがemitされる', async () => {
-    const wrapper = mount(AppSearchInput)
+    const wrapper = mount(AppSearchInput,{
+      props: {
+        placeholder: 'キーワードを入力してください',
+        dataTestid: 'test-search',
+      },
+    })
 
     const input = wrapper.get('input')
     await input.setValue('クリックで検索')
@@ -46,7 +62,12 @@ describe('AppSearchInput.vue', () => {
   })
 
   test('Enterキー押下でもsearchイベントがemitされる', async () => {
-    const wrapper = mount(AppSearchInput)
+    const wrapper = mount(AppSearchInput,{
+      props: {
+        placeholder: 'キーワードを入力してください',
+        dataTestid: 'test-search',
+      },
+    })
 
     const input = wrapper.get('input')
     await input.setValue('エンターで検索')
