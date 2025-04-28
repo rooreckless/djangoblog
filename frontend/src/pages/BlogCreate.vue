@@ -46,8 +46,6 @@ import { ref, computed } from "vue"
 import { useRouter } from "vue-router"
 import { useForm, useField } from 'vee-validate'
 import * as yup from 'yup'
-// 共通コンポーネントである「遷移ボタン」をインポート
-import AppTrasitionPageButton from '@/components/AppTrasitionPageButton.vue'
 
 // スキーマ定義=フォーム内パーツのバリデーションルールを定義し、yup ライブラリを使用してスキーマを作成
 // titleについては、必須項目であること、最大文字数200文字であることを指定

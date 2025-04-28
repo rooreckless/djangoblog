@@ -20,7 +20,7 @@
 // transitionPageToの関数ではprops.toが指定されていればそのURLに遷移し、指定されていなければ'/blogs'に遷移するようにしています。
 // props.toの値の指定の仕方は、<AppTransitionPageButton to="/blogs" text="ブログ一覧へ戻る" date-testid="some-datetest-id"/>のようにします。
 import { useRouter } from 'vue-router'
-import { defineProps,withDefaults } from 'vue'
+// defineEmits, defineProps,withDefaultsはvueからimportしなくてもいいようになっている
 
 // 明示的に受け取る props（その他は $attrs）
 // 特にdatatestidはpropsで渡すことができないのでattrsで受け取るようにしています。

@@ -12,7 +12,9 @@ describe('AppTrasitionPageButton', () => {
 
     const router = createRouter({
         history: createWebHistory(),  // HTML5の履歴モード
-        routes: [] // テストでは実際のルートは必要ない（ルーティング自体はしないので）
+        routes: [
+          { path: '/', component: { template: '<div>Home</div>' } }
+        ] // テストでは実際のルートは必要ない（ルーティング自体はしないので）
     })
 
     // 実際の router.push を、上で作ったモック関数に差し替える
