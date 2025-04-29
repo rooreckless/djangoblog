@@ -34,7 +34,14 @@ jobs:
           echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .envs/local/postgres
           echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .envs/local/postgres
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .envs/local/postgres
-  
+      - name: .envs files cat
+        run: |
+          echo ".envs/local/django"
+          cat .envs/local/django
+          echo ".envs/local/frontend"
+          cat .envs/local/frontend
+          echo ".envs/local/postgres"
+          cat .envs/local/postgres
       - name: Set UID/GID for CI
         run: |
           echo "UID=0" >> $GITHUB_ENV
