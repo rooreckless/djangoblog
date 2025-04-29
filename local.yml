@@ -30,8 +30,10 @@ services:
     restart: always
     user: "${UID:-1000}:${GID:-1000}"
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
+    # depends_on:
+    #   postgres:
+    #     condition: service_healthy
     env_file:
       - ./.envs/local/django
       - ./.envs/local/postgres
