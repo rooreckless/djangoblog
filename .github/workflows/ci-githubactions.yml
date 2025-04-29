@@ -41,7 +41,13 @@ jobs:
       - name: Run backend unit tests
         run: |
           docker compose -f local.yml run --rm backend pytest api/tests
+      
+      - name: Frontend unit tests (Vitest)
+        run: docker compose -f local.yml run --rm frontend npx vitest run tests
 
+      - name: Mocked E2E tests (Playwright)
+        run: docker compose -f local.yml --profile e2e-mock run --rm playwright-mock pytest mocked_tests
+      
       - name: Stop containers
         if: always()
         run: |
