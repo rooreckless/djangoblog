@@ -13,7 +13,8 @@ jobs:
   test-job:
     name: test-job
     runs-on: ubuntu-latest
-
+    environment:
+      name: EnvCiByGithubActions  # GitHub > Settings > secrets and variables > Actionsにて、Environment secretsに値を登録しているので。
     steps:
       - name: Checkout repository
         # https://qiita.com/shun198/items/14cdba2d8e58ab96cf95#actionscheckoutv4%E3%81%A3%E3%81%A6%E4%BD%95%E3%81%97%E3%81%A6%E3%82%8B%E3%81%AE
