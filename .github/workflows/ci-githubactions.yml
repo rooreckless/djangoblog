@@ -26,10 +26,10 @@ jobs:
         run: |
           mkdir -p .envs/local
           echo "DJANGO_SUPERUSER_USERNAME=${{ secrets.DJANGO_SUPERUSER_USERNAME }}" > .envs/local/django
-          echo "DJANGO_SUPERUSER_EMAIL=${{ secrets.DJANGO_SUPERUSER_EMAIL }}" > .envs/local/django
-          echo "DJANGO_SUPERUSER_PASSWORD=${{ secrets.DJANGO_SUPERUSER_PASSWORD }}" > .envs/local/django
-          echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> .envs/local/frontend
-          echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> .envs/local/postgres
+          echo "DJANGO_SUPERUSER_EMAIL=${{ secrets.DJANGO_SUPERUSER_EMAIL }}" >> .envs/local/django
+          echo "DJANGO_SUPERUSER_PASSWORD=${{ secrets.DJANGO_SUPERUSER_PASSWORD }}" >> .envs/local/django
+          echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" > .envs/local/frontend
+          echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" > .envs/local/postgres
           echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" >> .envs/local/postgres
           echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .envs/local/postgres
           echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .envs/local/postgres
