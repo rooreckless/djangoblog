@@ -22,7 +22,7 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
       
-      - name: Create Django .env file
+      - name: Create .envs files
         run: |
           mkdir -p .envs/local
           echo "DJANGO_SUPERUSER_USERNAME=${{ secrets.DJANGO_SUPERUSER_USERNAME }}" > .envs/local/django
@@ -34,7 +34,10 @@ jobs:
           echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .envs/local/postgres
           echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .envs/local/postgres
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .envs/local/postgres
-          
+      - name: Set UID/GID for CI
+        run: |
+          echo "UID=0" >> $GITHUB_ENV
+          echo "GID=0" >> $GITHUB_ENV
       - name: Build and start containers
         run: |
           docker compose -f local.yml up -d
