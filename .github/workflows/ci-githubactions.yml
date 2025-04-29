@@ -38,9 +38,12 @@ jobs:
         run: |
           docker compose -f local.yml run --rm backend python manage.py migrate
       
+      # - name: Run backend unit tests
+      #   run: |
+      #     docker compose -f local.yml run --rm backend pytest api/tests
       - name: Run backend unit tests
         run: |
-          docker compose -f local.yml run --rm backend pytest api/tests
+          docker compose -f local.yml run --rm backend pytest aaaaapi/tests
       
       - name: Frontend unit tests (Vitest)
         run: docker compose -f local.yml run --rm frontend npx vitest run tests
