@@ -22,47 +22,22 @@ jobs:
 
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
+      
       - name: Create .envs files
         run: |
           mkdir -p .envs/local
           echo "${{ secrets.DJANGO_ENV_FILE }}" > .envs/local/django
           echo "${{ secrets.POSTGRES_ENV_FILE }}" > .envs/local/postgres
           echo "${{ secrets.FRONTEND_ENV_FILE }}" > .envs/local/frontend
-      # - name: Create .envs files
-      #   run: |
-      #     mkdir -p .envs/local
-      #     echo "DJANGO_SUPERUSER_USERNAME=${{ secrets.DJANGO_SUPERUSER_USERNAME }}" > .envs/local/django
-      #     echo "DJANGO_SUPERUSER_EMAIL=${{ secrets.DJANGO_SUPERUSER_EMAIL }}" >> .envs/local/django
-      #     echo "DJANGO_SUPERUSER_PASSWORD=${{ secrets.DJANGO_SUPERUSER_PASSWORD }}" >> .envs/local/django
-      #     echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" > .envs/local/frontend
-      #     echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" > .envs/local/postgres
-      #     echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" >> .envs/local/postgres
-      #     echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .envs/local/postgres
-      #     echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .envs/local/postgres
-      #     echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .envs/local/postgres
-      # - name: .envs files cat
-      #   run: |
-      #     echo ".envs/local/django"
-      #     cat .envs/local/django
-      #     echo ".envs/local/frontend"
-      #     cat .envs/local/frontend
-      #     echo ".envs/local/postgres"
-      #     cat .envs/local/postgres
-      # - name: Set UID/GID for CI
-      #   run: |
-      #     echo "UID=0" >> $GITHUB_ENV
-      #     echo "GID=0" >> $GITHUB_ENV
       
       - name: Build and start containers
         run: |
           docker compose -f local.yml up -d
       
-      
       - name: Run migrate
         run: |
           docker compose -f local.yml run --rm backend python manage.py migrate
       
-  
       - name: Run backend unit tests
         run: |
           docker compose -f local.yml run --rm backend pytest api/tests
