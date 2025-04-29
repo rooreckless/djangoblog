@@ -40,13 +40,13 @@ jobs:
           echo "UID=0" >> $GITHUB_ENV
           echo "GID=0" >> $GITHUB_ENV
   
-      - name: Build and start containers
-        run: |
-          docker compose -f local.yml up -d
-  
       - name: Run migrate
         run: |
           docker compose -f local.yml run --rm backend python manage.py migrate
+
+      - name: Build and start containers
+        run: |
+          docker compose -f local.yml up -d
   
       - name: Run backend unit tests
         run: |
