@@ -34,14 +34,20 @@ jobs:
           echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .envs/local/postgres
           echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .envs/local/postgres
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .envs/local/postgres
+  
       - name: Set UID/GID for CI
         run: |
           echo "UID=0" >> $GITHUB_ENV
           echo "GID=0" >> $GITHUB_ENV
+  
       - name: Build and start containers
         run: |
           docker compose -f local.yml up -d
-
+  
+      - name: Run migrate
+        run: |
+          docker compose -f local.yml run --rm backend python manage.py migrate
+  
       - name: Run backend unit tests
         run: |
           docker compose -f local.yml run --rm backend pytest api/tests
