@@ -13,13 +13,13 @@ services:
     ports:
       - "5432:5432"
     # user: "${UID:-1000}:${GID:-1000}" #<- postgresにはこれはかけない
-    healthcheck:
-      #ヘルスチェック(postgresが正常に動作しているかどうか)は以下のスクリプトを実行して行う
-      # test: ["CMD", "/usr/local/bin/check-db.sh"]
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
+    # healthcheck:
+    #   #ヘルスチェック(postgresが正常に動作しているかどうか)は以下のスクリプトを実行して行う
+    #   # test: ["CMD", "/usr/local/bin/check-db.sh"]
+    #   test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 10
   backend:
     build:
       context: .
