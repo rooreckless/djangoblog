@@ -7,7 +7,7 @@ jobs:
   e2e-real-tests:
     runs-on: ubuntu-latest
     environment:
-      name: EnvCiByGithubActions  # Secretsを読み込む環境名
+      name: EnvManuallyE2EtestByGithubActions  # Secretsを読み込む環境名
 
     steps:
       - name: Checkout repository
