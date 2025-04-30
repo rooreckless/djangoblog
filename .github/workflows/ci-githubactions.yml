@@ -1,0 +1,58 @@
+# https://qiita.com/shun198/items/14cdba2d8e58ab96cf95
+name: GithubActionsWorkflow For Run backend tests
+
+on:
+  # このワークフローが実行される条件は、developmentブランチにpull_requestがだされたとき
+  pull_request:
+    branches:
+      - development 
+# このワークフローが実行する内容が以下
+
+jobs:
+  # ジョブ = GithubActionsによる実行処理の最小単位(ジョブは並列実行できる)
+  test-job:
+    name: test-job
+    runs-on: ubuntu-latest
+    environment:
+      name: EnvCiByGithubActions  # GitHub > Settings > secrets and variables > Actionsにて、Environment secretsに値を登録しているので。
+    steps:
+      - name: Checkout repository
+        # https://qiita.com/shun198/items/14cdba2d8e58ab96cf95#actionscheckoutv4%E3%81%A3%E3%81%A6%E4%BD%95%E3%81%97%E3%81%A6%E3%82%8B%E3%81%AE
+        uses: actions/checkout@v4
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Create .envs files
+        run: |
+          mkdir -p .envs/local
+          echo "${{ secrets.DJANGO_ENV_FILE }}" > .envs/local/django
+          echo "${{ secrets.POSTGRES_ENV_FILE }}" > .envs/local/postgres
+          echo "${{ secrets.FRONTEND_ENV_FILE }}" > .envs/local/frontend
+      
+      - name: Build and start containers
+        run: |
+          docker compose -f local.yml up -d
+      
+      - name: Run migrate
+        run: |
+          docker compose -f local.yml run --rm backend python manage.py migrate
+      
+      - name: Run backend unit tests
+        run: |
+          docker compose -f local.yml run --rm backend pytest api/tests
+      
+      - name: Frontend unit tests (Vitest)
+        run: docker compose -f local.yml run --rm frontend npx vitest run tests
+
+      - name: Mocked E2E tests (Playwright)
+        run: docker compose -f local.yml --profile e2e-mock run --rm playwright-mock pytest mocked_tests
+      
+      - name: Stop containers
+        if: always()
+        run: |
+          docker compose -f local.yml down
+
+# 「developmentブランチにpull_request提出 -> テスト実施 -> テストが全部通ったならばPRをマージ可能な状態になる」
+# には、githubリポジトリページ -> Settings -> Branchesで「branch protection rules」に「Add branch rule set」そのルールを設定する必要がある。
+# 特にそのルールの中で「Require status checks to pass before merging」にチェックを入れ、このymlのワークフローnameを選択する必要がある。
