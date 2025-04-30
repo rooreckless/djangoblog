@@ -1,4 +1,4 @@
-name: Run real E2E tests manually
+name: Run Workflow real E2E tests manually
 
 on:
   workflow_dispatch:  # ← 手動実行のみ
