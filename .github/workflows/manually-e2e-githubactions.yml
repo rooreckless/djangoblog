@@ -1,0 +1,43 @@
+name: Run real E2E tests manually
+
+on:
+  workflow_dispatch:  # ← 手動実行のみ
+
+jobs:
+  e2e-real-tests:
+    runs-on: ubuntu-latest
+    environment:
+      name: EnvCiByGithubActions  # Secretsを読み込む環境名
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create .envs files
+        run: |
+          mkdir -p .envs/e2e
+          echo "${{ secrets.DJANGO_ENV_FILE }}" > .envs/e2e/django
+          echo "${{ secrets.POSTGRES_ENV_FILE }}" > .envs/e2e/postgres
+          echo "${{ secrets.FRONTEND_ENV_FILE }}" > .envs/e2e/frontend
+
+      - name: Docker compose up with e2e.yml
+        run: docker compose -f e2e.yml up -d
+
+      # - name: Run migrations
+      #   run: docker compose -f e2e.yml run --rm backend python manage.py migrate
+
+      - name: Run migrations and create superuser and test data
+        run: sh scripts/e2e/setup-script.sh
+
+      # - name: Run real E2E tests
+      #   run: docker compose -f e2e.yml run --rm playwright-real pytest real_tests
+
+      - name: Run real E2E tests script
+        run: sh scripts/e2e/e2etest-script.sh
+
+      - name: Docker compose down
+        if: always()
+        run: docker compose -f e2e.yml down
