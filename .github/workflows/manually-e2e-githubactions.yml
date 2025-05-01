@@ -2,14 +2,14 @@ name: Real E2E Tests MANUALLY
 
 on:
   workflow_dispatch:  # ← このワークフローは手動実行のみ
-
-# 実行対象ブランチを制限することも可能（任意）
-  inputs:
-    # 作業ブランチではこのワークフローを動実行させない。developmentかmainのみ
-    branch:
-      type: choice
-      options: [development, main]
-      default: development
+    inputs:
+      # 実行対象ブランチを制限することも可能
+      # 作業ブランチではこのワークフローを手動実行させない。developmentかmainのみ
+      branch:
+        description: '実行ブランチを選択（作業ブランチではなく development や main）'
+        type: choice
+        options: [development, main]
+        default: development
 
 jobs:
   e2e-real-tests:
@@ -20,7 +20,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
+        # 手動実行で選択したブランチをチェックアウト
+        with:
+          ref: ${{ inputs.branch }}
+    
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
 
