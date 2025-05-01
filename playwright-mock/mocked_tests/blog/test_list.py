@@ -1,9 +1,12 @@
 # # playwright/e2etests/test_blog_list.py
-import pytest
+import pytest, json, os
 from playwright.sync_api import Page, Route, Request, expect
 def test_pagetitle(page):
     # playwrightコンテナから、フロントエンドへアクセスする場合、localhost:5173ではなく、docker-composeのサービス名でのアクセスが必要
-    page.goto("http://frontend:5173/blogs/")
+    base_url = os.environ.get("BASE_URL")
+    # page.goto("http://frontend:5173/blogs/")
+    # page.goto('http://front_nginx/blogs/')
+    page.goto(f"{base_url}/blogs")
     # page.content() # <- デバッグ用 playwrightが見ているpageのDOMを全部出力する
     # page.wait_for_selector("text=ブログ一覧")  # ← これで特定の要素が表示されるまで待つことができる(↓のexpectで待つことができるから不要だが)
     
@@ -41,8 +44,12 @@ def test_blog_list_with_mocked_api(page: Page, mocked_blog_api_response):
 
     # モックを有効化
     page.route("**/api/v1/blogs/**", handle_route)
+    base_url = os.environ.get("BASE_URL")
 
-    page.goto("http://frontend:5173/blogs/")
+    
+    # page.goto("http://frontend:5173/blogs/")
+    # page.goto('http://front_nginx/blogs/')
+    page.goto(f"{base_url}/blogs")
     expect(page.get_by_test_id("bloglist-section-title")).to_have_text("ブログ一覧")
     # expect(page.locator('[data-testid="bloglist-blog-item"]')).to_have_count(4)
     expect(page.get_by_test_id("bloglist-blog-item")).to_have_count(4)
@@ -110,7 +117,10 @@ def test_pagination_next_page(page: Page, mocked_paginated_response2p):
 
     page.route("**/api/v1/blogs/**", handle_route)
 
-    page.goto("http://frontend:5173/blogs/")
+    base_url = os.environ.get("BASE_URL")
+    # page.goto("http://frontend:5173/blogs/")
+    # page.goto('http://front_nginx/blogs/')
+    page.goto(f"{base_url}/blogs")
     expect(page.get_by_test_id("bloglist-blog-item")).to_have_count(10)
     expect(page.get_by_test_id("bloglist-blog-title-1")).to_be_visible()
     expect(page.get_by_test_id("bloglist-blog-title-13")).not_to_be_visible()
@@ -183,7 +193,11 @@ def test_blogs_title_click_navigates_to_detail(page: Page, blog_list_response, b
     page.route("**/api/v1/blogs/**", handle_route_bloglist)
     page.route("**/api/v1/blogs/1/**", handle_route_blogretrieve1)
     # 一覧ページを開く
-    page.goto("http://frontend:5173/blogs/")
+    base_url = os.environ.get("BASE_URL")
+    # page.goto("http://frontend:5173/blogs/")
+    # page.goto('http://front_nginx/blogs/')
+    page.goto(f"{base_url}/blogs")
+
     expect(page.get_by_test_id("bloglist-blog-title-1")).to_have_text("モックタイトル1")
 
     # タイトルクリックで詳細へ遷移

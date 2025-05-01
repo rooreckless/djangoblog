@@ -10,6 +10,19 @@ services:
       # - ./frontend:/app  # ホストの ./frontend をコンテナの /app にマウント（コード変更が即反映される）<- いらない。vite開発サーバーはdevelopmentでは使わないから
       - ./front_nginx:/front_nginx
       - node_modules:/app/node_modules  # node_modules はボリュームで分離（ホストと衝突を避ける）ただしこのディレクトリはroot所有者になる。
+  playwright-mock:
+    build:
+      context: .
+      dockerfile: ./playwright-mock/dockerfile/local/Dockerfile
+    profiles:
+      - e2e-mock
+    depends_on:
+      - front_nginx
+    working_dir: /app
+    env_file:
+      - ./.envs/development/frontend
+    volumes:
+      - ./playwright-mock:/app  # ← playwright-mock の中の mocked_tests をマウント
 volumes:
   db_data:
   node_modules:  # Vueプロジェクトの依存ファイルを保持するボリューム
