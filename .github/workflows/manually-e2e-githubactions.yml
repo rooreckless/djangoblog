@@ -8,7 +8,7 @@ on:
       branch:
         description: '実行ブランチを選択（作業ブランチではなく development や main）'
         type: choice
-        options: [development, main]
+        options: [development, main,e2etest-running-by-manually-githubactions]
         default: development
 
 jobs:
