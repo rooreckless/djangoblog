@@ -34,7 +34,14 @@
 import { ref, onMounted } from "vue";
 import { useRoute,useRouter } from "vue-router";
 
-const blog = ref(null);
+// interface
+interface Blog {
+  id: number
+  title: string
+  contents_text: string
+  created: string  // 日付はISO文字列として扱う場合は string
+}
+const blog = ref<Blog>();
 const route = useRoute();
 const router = useRouter()
 

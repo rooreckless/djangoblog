@@ -74,19 +74,39 @@
 <script setup lang="ts">
   import { ref, onMounted, watch } from "vue";
   import moment from "moment"
-   
+  
+  // interface
+  interface Blog {
+    id: number
+    title: string
+    contents_text: string
+    created: string  // 日付はISO文字列として扱う場合は string
+  }
+  interface BlogListResponse {
+    results: Blog[]
+    num_of_items: number
+  }
+
   const baseURL = import.meta.env.VITE_API_BASE_URL;
-  const blogs = ref([]);
-  const searchword = ref("");
-  const currentPage = ref(1);
-  const pageSize = ref(10);
-  const totalPages = ref(1);
+  // const blogs = ref([]);
+  const blogs = ref<Blog[]>([]);
+  // const searchword = ref("");
+  // const currentPage = ref(1);
+  // const pageSize = ref(10);
+  // const totalPages = ref(1);
+
+  const searchword = ref<string>('')
+  const totalPages = ref<number>(1)
+  const currentPage = ref<number>(1)
+  const pageSize = ref<number>(10)
+
 
   // methods  
   const getBlogLists = async ()=>{
     try {
       const response = await fetch(`${baseURL}/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
-      const responseBody = await response.json();
+      // const responseBody = await response.json();
+      const responseBody: BlogListResponse = await response.json()
       blogs.value = responseBody["results"];
       totalPages.value = Math.ceil(responseBody["num_of_items"] /pageSize.value);
     } catch (error) {
