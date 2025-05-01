@@ -8,7 +8,8 @@ COPY ./backend/requirements/local.txt /app/requirements-django.txt
 RUN pip install --upgrade pip && pip install -r requirements-e2e-real.txt && pip install -r requirements-django.txt
 
 # Playwrightのブラウザをインストール（必要に応じて）
-RUN playwright install
+# chromiumだけ指定してるが、しなかったらChromiumと、Chromium HeadlessとFirefoxとWebkitのダウンロード = 時間かかりすぎる
+RUN playwright install chromium
 
 # ----
 # 【このplaywrightコンテナを使ったテストを実施する方法】
