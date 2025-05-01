@@ -13,6 +13,7 @@ RUN npm run build
 #---ここまでが、node.jsイメージでのステージ(ビルド用) --　ここからはnginxでの動作---
 # nginxでの配信用ステージ（最終イメージ）
 FROM nginx:latest
+# マルチステージビルドの1つめ(=AS builderとしたFROM部分)で作成されたコンテナの/app/distディレクトリ内のものをnginxコンテナの配信ディレクトリへコピー
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Nginx 設定カスタマイズが必要なら:
