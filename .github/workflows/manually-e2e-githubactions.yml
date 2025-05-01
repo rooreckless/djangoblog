@@ -1,7 +1,7 @@
-name: Run Workflow real E2E tests manually
+name: Real E2E Tests MANUALLY
 
 on:
-  workflow_dispatch:  # ← 手動実行のみ
+  workflow_dispatch:  # ← このワークフローは手動実行のみ
 
 jobs:
   e2e-real-tests:
@@ -26,14 +26,8 @@ jobs:
       - name: Docker compose up with e2e.yml
         run: docker compose -f e2e.yml up -d
 
-      # - name: Run migrations
-      #   run: docker compose -f e2e.yml run --rm backend python manage.py migrate
-
       - name: Run migrations and create superuser and test data
         run: sh scripts/e2e/setup-script.sh
-
-      # - name: Run real E2E tests
-      #   run: docker compose -f e2e.yml run --rm playwright-real pytest real_tests
 
       - name: Run real E2E tests script
         run: sh scripts/e2e/e2etest-script.sh
