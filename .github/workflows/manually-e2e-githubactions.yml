@@ -3,6 +3,14 @@ name: Real E2E Tests MANUALLY
 on:
   workflow_dispatch:  # ← このワークフローは手動実行のみ
 
+# 実行対象ブランチを制限することも可能（任意）
+  inputs:
+    # 作業ブランチではこのワークフローを動実行させない。developmentかmainのみ
+    branch:
+      type: choice
+      options: [development, main]
+      default: development
+
 jobs:
   e2e-real-tests:
     runs-on: ubuntu-latest
