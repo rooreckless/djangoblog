@@ -1,7 +1,7 @@
 FROM python:3.12.9-slim
 WORKDIR /app
 COPY ./backend/requirements/local.txt /app/requirements/local.txt
-RUN pip install -r /app/requirements/local.txt
+RUN pip install --upgrade pip && pip install -r /app/requirements/local.txt
 
 #--0 バックエンドで最初にやったこと--
 # 1.docker-compose -f local.yml run --rm backend /bin/bashでログイン後、pip install でパッケージインストール → その後pip freeze > requirements/local.txtでtext化

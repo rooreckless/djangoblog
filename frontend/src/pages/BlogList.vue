@@ -105,6 +105,9 @@
   const getBlogLists = async ()=>{
     try {
       const response = await fetch(`${baseURL}/api/v1/blogs/?page=${currentPage.value}&size=${pageSize.value}`);
+      console.log("---baseURL=",baseURL)
+      console.log("---response=",response)
+      // console.log("---await response.json()=",await response.json())
       // const responseBody = await response.json();
       const responseBody: BlogListResponse = await response.json()
       blogs.value = responseBody["results"];

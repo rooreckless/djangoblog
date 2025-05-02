@@ -68,7 +68,7 @@ services:
       context: .
       dockerfile: ./playwright-mock/dockerfile/local/Dockerfile
     image: djangoblog_local_playwright_mock_img
-    container_name: djangoblog_local_playwright_mock
+    container_name: djangoblog_local_playwright-mock
     profiles: # 単にdocker-compose upをしただけでは、このplaywrightサービスは動かないようにする --profile e2e-mockが指定されたら動かせる
       - e2e-mock
     depends_on:

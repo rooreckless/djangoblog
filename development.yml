@@ -4,16 +4,22 @@ services:
     build:
       context: .  # このサービスについてはビルド時はfrontendを基準ディレクトリにするのではなく、このymlファイルがある場所になります。
       dockerfile: ./frontend/dockerfile/development/Dockerfile
+      args:
+        # VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+        VITE_API_BASE_URL: http://localhost:8000
     ports:
       - "8080:80"
     volumes:
       # - ./frontend:/app  # ホストの ./frontend をコンテナの /app にマウント（コード変更が即反映される）<- いらない。vite開発サーバーはdevelopmentでは使わないから
       - ./front_nginx:/front_nginx
       - node_modules:/app/node_modules  # node_modules はボリュームで分離（ホストと衝突を避ける）ただしこのディレクトリはroot所有者になる。
+    env_file:
+      - ./.envs/development/frontend
   playwright-mock:
     build:
       context: .
       dockerfile: ./playwright-mock/dockerfile/local/Dockerfile
+    container_name: djangoblog_development_playwright-mock
     profiles:
       - e2e-mock
     depends_on:
@@ -23,6 +29,52 @@ services:
       - ./.envs/development/frontend
     volumes:
       - ./playwright-mock:/app  # ← playwright-mock の中の mocked_tests をマウント
+  backend_gunicorn:
+    build:
+      context: .
+      dockerfile: ./backend/dockerfile/development/Dockerfile
+    image: djangoblog_development_backend_img
+    container_name: djangoblog_development_backend_gunicorn
+    restart: always
+    user: "${UID:-1000}:${GID:-1000}"
+    # depends_on:
+    #   - postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - ./.envs/development/django
+      - ./.envs/development/postgres
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+      # 以下はバックエンドディレクトリの外にあるpytestファイルを、コンテナのapp内に置かないとテストができないのでマウント
+      # - ./pytest.ini:/app/pytest.ini
+    ports:
+      - "8000:8000"
+    command: python manage.py runserver 0.0.0.0:8000
+  postgres:
+    build:
+      context: ./postgres
+      dockerfile: ./Dockerfile
+    image: djangoblog_development_postgres_img
+    container_name: djangoblog_development_postgres
+    restart: always
+    env_file:
+      - ./.envs/development/postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    # user: "${UID:-1000}:${GID:-1000}" #<- postgresにはこれはかけない
+    healthcheck:
+      #ヘルスチェック(postgresが正常に動作しているかどうか)は以下のスクリプトを実行して行う
+      # test: ["CMD", "/usr/local/bin/check-db.sh"]
+      # スクリプトファイルではなく、直接コマンドを実行。ダブルドルにしておくのは、composeファイル内でのエスケープのため
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 volumes:
   db_data:
   node_modules:  # Vueプロジェクトの依存ファイルを保持するボリューム
