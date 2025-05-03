@@ -1,4 +1,10 @@
 FROM python:3.12.9-slim
+
+# Pythonが .pyc ファイル（バイトコードキャッシュ）を生成しないようにする
+ENV PYTHONDONTWRITEBYTECODE=1
+# Pythonの出力をバッファリングしない（= 常に即時出力する=docker logsに即時反映される）
+ENV PYTHONUNBUFFERED=1
+
 WORKDIR /app
 COPY ./backend/requirements/local.txt /app/requirements/local.txt
 RUN pip install --upgrade pip && pip install -r /app/requirements/local.txt

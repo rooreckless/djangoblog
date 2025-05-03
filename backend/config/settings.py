@@ -170,10 +170,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Vueアプリ（localhost:5173）からのアクセスを許可
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:5173",
-# ]
+# Vueアプリ（ローカル=vite開発サーバー=localhost:5173、develop=nginx=localhost:8080）からのアクセスを許可する必要があるので、
+# .envsの各環境変数ファイルにカンマ区切りで入れてください
 CORS_ALLOWED_ORIGINS = os.getenv("DJANGO_CORS_ALLOWED_ORIGINS_LIST").split(',')
 
 # OPTIONS リクエストに対応
