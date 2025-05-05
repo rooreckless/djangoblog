@@ -59,7 +59,8 @@ def test_create_blog_success(page: Page):
     # フロントエンドの作成画面へ遷移
     # page.goto("http://frontend:5173/blogs/create")
     # page.goto('http://front_nginx/blogs/create')
-    page.goto(f"{base_url}/blogs/create")
+    # page.goto(f"{base_url}/blogs/create")
+    page.goto("http://host.docker.internal/blogs/create")
 
     # 入力フォームにデータを入力
     page.get_by_test_id("blogcreate-input-title").fill("モックタイトル")
@@ -71,8 +72,8 @@ def test_create_blog_success(page: Page):
     # 成功した場合の挙動を検証 = ブログ一覧ページに戻っているはず
     # expect(page).to_have_url("http://frontend:5173/blogs")
     # expect(page).to_have_url("http://front_nginx/blogs")
-    expect(page).to_have_url(f"{base_url}/blogs")
-
+    # expect(page).to_have_url(f"{base_url}/blogs")
+    expect(page).to_have_url("http://host.docker.internal/blogs")
 
 
 def test_blog_create_success_request_response(page: Page):

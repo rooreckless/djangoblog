@@ -41,13 +41,14 @@ interface Blog {
   contents_text: string
   created: string  // 日付はISO文字列として扱う場合は string
 }
+const baseURL = import.meta.env.VITE_API_BASE_URL;
 const blog = ref<Blog>();
 const route = useRoute();
 const router = useRouter()
 
 onMounted(async () => {
   const id = route.params.id;
-  const response = await fetch(`http://localhost:8000/api/v1/blogs/${id}/`);
+  const response = await fetch(`${baseURL}/api/v1/blogs/${id}/`);
   blog.value = await response.json();
 });
 

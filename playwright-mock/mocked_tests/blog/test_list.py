@@ -49,7 +49,9 @@ def test_blog_list_with_mocked_api(page: Page, mocked_blog_api_response):
     
     # page.goto("http://frontend:5173/blogs/")
     # page.goto('http://front_nginx/blogs/')
-    page.goto(f"{base_url}/blogs")
+    # page.goto(f"{base_url}/blogs")
+    # page.goto("http://localhost/blogs")
+    page.goto("http://host.docker.internal/blogs")
     expect(page.get_by_test_id("bloglist-section-title")).to_have_text("ブログ一覧")
     # expect(page.locator('[data-testid="bloglist-blog-item"]')).to_have_count(4)
     expect(page.get_by_test_id("bloglist-blog-item")).to_have_count(4)

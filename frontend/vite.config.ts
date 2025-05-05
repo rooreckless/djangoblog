@@ -78,6 +78,6 @@ export default defineConfig({
     watch: {
       usePolling: true,
     },
-    allowedHosts: ['frontend'],
+    allowedHosts: ['frontend','localhost', 'host.docker.internal'],
   }
 })

@@ -113,6 +113,9 @@ services:
     user: "${UID:-1000}:${GID:-1000}"
     env_file:
       - ./.envs/local/frontend
+    extra_hosts:
+      # - "localhost:host-gateway"
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./playwright-mock:/app  # ← テストケースファイルはこの中のe2e_testsディレクトリだが、test_resultsもここに作成される
     # entrypoint: [ "tail", "-f", "/dev/null" ]  # デバッグ用。任意で変更可。
