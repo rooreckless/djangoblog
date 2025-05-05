@@ -69,7 +69,7 @@ const { handleSubmit, errors :form_errors } = useForm({
 // 各フィールドを useField で接続
 // {value: title}のtitleは、v-modelで使用できるようになる。useField('title')の方はschemaｍのyup.objectに入れたオブジェクトのことを指す
 const { value: title} = useField('title')
-const { value: contents_text} = useField('contents_text')
+const { value: contents_text} = useField<string>('contents_text')
 // useFieldで定義しているので、v-modelで双方バインディングする変数は作成しなくていい。
 // const title = ref("")
 // const contentsText = ref("")

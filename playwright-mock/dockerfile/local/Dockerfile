@@ -7,7 +7,8 @@ COPY ./playwright-mock/dockerfile/local/requirements.txt /app/requirements.txt
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # Playwrightのブラウザをインストール（必要に応じて）
-RUN playwright install
+# chromiumだけ指定してるが、しなかったらChromiumと、Chromium HeadlessとFirefoxとWebkitのダウンロード = 時間かかりすぎる
+RUN playwright install chromium
 
 # ----
 # 【このplaywrightコンテナを使ったテストを実施する方法】

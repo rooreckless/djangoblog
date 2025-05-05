@@ -1,21 +1,101 @@
 services:
-  # マルチステージビルドなフロントエンドコンテナ (最終的に動くのはnginxだが、node.jsでviteをビルドしてから、nginxで配信する)
-  front_nginx:
+  frontend:
+    #このfrontendサービスは npm run buildのためだけのサービス
+    # docker compose -f development.yml run --rm frontend コマンドでビルド
+    # ↓
+    # frontend/distにビルド済みデータが作成される
     build:
-      context: .  # このサービスについてはビルド時はfrontendを基準ディレクトリにするのではなく、このymlファイルがある場所になります。
-      dockerfile: ./frontend/dockerfile/development/Dockerfile
+      context: ./frontend
+      dockerfile: ./dockerfile/development/Dockerfile
+      args:
+        # npm run build時に使う環境変数 = バックエンドへのfetch先
+        # ここに記述するので、.envs/development/frontendからはVITE_API_BASE_URLは削除する
+        VITE_API_BASE_URL: http://localhost:8000
+    env_file:
+      - ./.envs/development/frontend
+    working_dir: /app
+    command: npm run build
+    volumes:
+      - ./frontend:/app
+      - node_modules:/app/node_modules
+    user: "${UID:-1000}:${GID:-1000}"
+    container_name: djangoblog_development_buildonly_frontend
+    profiles:
+      - buildonly  # docker composeコマンドで起動時は --profile=buildonlyをいれた時にだけ起動 = 単にupするとこのコンテナは起動しない
+  # front_nginx & backend_gunicorn & postgresサービスは、↑でfrontendのビルドができてから、docker compose -f development.yml upで起動する。
+  front_nginx:  
+    image: nginx:latest
+    container_name: djangoblog_development_front_nginx
     ports:
       - "8080:80"
     volumes:
-      - ./frontend:/app  # ホストの ./frontend をコンテナの /app にマウント（コード変更が即反映される）
-      - ./front_nginx:/front_nginx
-      - node_modules:/app/node_modules  # node_modules はボリュームで分離（ホストと衝突を避ける）ただしこのディレクトリはroot所有者になる。
+      - ./frontend/dist:/usr/share/nginx/html:ro
+      - ./front_nginx/nginx_confs/development/nginx.conf:/etc/nginx/nginx.conf
+    restart: always
+  playwright-mock:
+    build:
+      context: .
+      dockerfile: ./playwright-mock/dockerfile/local/Dockerfile
+    container_name: djangoblog_development_playwright-mock
+    profiles:
+      - e2e-mock
+    depends_on:
+      - front_nginx
+    working_dir: /app
+    env_file:
+      - ./.envs/development/frontend
+    volumes:
+      - ./playwright-mock:/app  # ← playwright-mock の中の mocked_tests をマウント
+  backend_gunicorn:
+    build:
+      context: .
+      dockerfile: ./backend/dockerfile/development/Dockerfile
+    image: djangoblog_development_backend_img
+    container_name: djangoblog_development_backend_gunicorn
+    restart: always
+    user: "${UID:-1000}:${GID:-1000}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - ./.envs/development/django
+      - ./.envs/development/postgres
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+      # 以下はバックエンドディレクトリの外にあるpytestファイルを、コンテナのapp内に置かないとテストができないのでマウント
+      # - ./pytest.ini:/app/pytest.ini
+    ports:
+      - "8000:8000"
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
+  postgres:
+    build:
+      context: ./postgres
+      dockerfile: ./Dockerfile
+    image: djangoblog_development_postgres_img
+    container_name: djangoblog_development_postgres
+    restart: always
+    env_file:
+      - ./.envs/development/postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    # user: "${UID:-1000}:${GID:-1000}" #<- postgresにはこれはかけない
+    healthcheck:
+      #ヘルスチェック(postgresが正常に動作しているかどうか)は以下のスクリプトを実行して行う
+      # test: ["CMD", "/usr/local/bin/check-db.sh"]
+      # スクリプトファイルではなく、直接コマンドを実行。ダブルドルにしておくのは、composeファイル内でのエスケープのため
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 volumes:
   db_data:
   node_modules:  # Vueプロジェクトの依存ファイルを保持するボリューム
-  # frontend_build:  # フロントエンドのビルド結果を格納するボリューム
 
 #-------
 #このdocker-compose.ymlを使う場合、フロントエンドのビルドのためのコマンドと、配信のためのコマンドを叩く必要がある。
-# ビルド : docker-compose -f development.yml run --rm frontend-builder
-# 配信   : docker-compose -f development.yml up nginx
+# ビルド : docker compose -f development.yml run --rm frontend
+# 配信   : docker compose -f development.yml up
+# バックエンドのマイグレーション & スーパーユーザー作成 & 初期データ作成 : sh scripts/development/setup-scripts.sh
