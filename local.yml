@@ -37,6 +37,7 @@ services:
         condition: service_healthy
     env_file:
       - ./.envs/local/django
+      - ./.envs/local/frontend
       - ./.envs/local/postgres
     volumes:
       - ./backend:/app
@@ -81,7 +82,6 @@ services:
     volumes:
       - ./playwright-mock:/app  # ← テストケースファイルはこの中のe2e_testsディレクトリだが、test_resultsもここに作成される
     # entrypoint: [ "tail", "-f", "/dev/null" ]  # デバッグ用。任意で変更可。
-  
   # nginx:
   #   image: nginx:latest
   #   container_name: djangoblog_local_nginx
@@ -92,9 +92,10 @@ services:
   #     - frontend
   #   volumes:
   #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-  #     - ./nginx/cert.pem:/etc/nginx/cert.pem
-  #     - ./nginx/key.pem:/etc/nginx/key.pem
+  #     # - ./nginx/cert.pem:/etc/nginx/cert.pem
+  #     # - ./nginx/key.pem:/etc/nginx/key.pem
   #   ports:
+  #     - "80:80"
   #     - "443:443"
 volumes:
   db_data:

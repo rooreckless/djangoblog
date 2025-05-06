@@ -9,8 +9,8 @@ services:
       dockerfile: ./dockerfile/development/Dockerfile
       args:
         # npm run build時に使う環境変数 = バックエンドへのfetch先
-        # ここに記述するので、.envs/development/frontendからはVITE_API_BASE_URLは削除する
-        VITE_API_BASE_URL: http://localhost:8000
+        # ここに記述するので、.envs/development/frontendからはVITE_API_HOST_ADDRESSは削除する
+        VITE_API_HOST_ADDRESS: http://localhost:8000
     env_file:
       - ./.envs/development/frontend
     working_dir: /app

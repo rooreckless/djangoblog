@@ -87,7 +87,7 @@
     num_of_items: number
   }
 
-  const baseURL = import.meta.env.VITE_API_BASE_URL;
+  const baseURL = import.meta.env.VITE_API_HOST_ADDRESS;
   // const blogs = ref([]);
   const blogs = ref<Blog[]>([]);
   // const searchword = ref("");
