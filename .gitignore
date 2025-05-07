@@ -413,3 +413,10 @@ playwright-real/e2e_tests/result
 playwright-real/e2e_tests/test-results
 playwright-mock/mocked_tests/result
 playwright-mock/mocked_tests/test-results
+
+# backend/static/default = python manage.py collectstatic --no-inputの実行結果の静的ファイル群
+# ただし、空ディレクトリでもgitに上げたいのでgitkeepもいれておきます。.gitkeep自体も上がってほしいので記載
+backend/static/*
+!/backend/static/.gitkeep   # 空ディレクトリ保持用（任意）
+!/backend/static/default/.gitkeep  # defaultディレクトリは保持してもよい
+!/backend/static/my_images/.gitkeep   # 空ディレクトリ保持用（任意）

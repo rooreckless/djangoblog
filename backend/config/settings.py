@@ -163,7 +163,12 @@ USE_I18N = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = 'static/'  # バックエンドが提供する静的ファイルに関して、（=ブラウザから）からのアクセスを受け付けるURLパス
+STATIC_ROOT = os.path.join(BASE_DIR, "static", "default") #collectstatic によってファイルがコピーされる実ファイルの保存先
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static", "my_images") # backend/static/default以外にも追加したい静的ファイルがあれば、backend/static/my_imagesにいれる
+]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -172,9 +177,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Vueアプリ（ローカル=vite開発サーバー=localhost:5173、develop=nginx=localhost:8080）からのアクセスを許可する必要があるので、
 # .envsの各環境変数ファイルにカンマ区切りで入れてください
-CORS_ALLOWED_ORIGINS = os.getenv("DJANGO_CORS_ALLOWED_ORIGINS_LIST").split(',')
-
+# CORS_ALLOWED_ORIGINS = os.getenv("DJANGO_CORS_ALLOWED_ORIGINS_LIST").split(',')
+# 現状ではCORSとして許可する相手は「fetchのアクセス元」くらい なので、フロントのアクセス元をフロントの環境変数ファイルから取ってくる
+CORS_ALLOWED_ORIGINS = []
+CORS_ALLOWED_ORIGINS.append(os.getenv("VITE_FRONT_HOST_ADDRESS"))
 # OPTIONS リクエストに対応
 CORS_ALLOW_HEADERS = list(default_headers) + [
     # 必要に応じてカスタムヘッダーを追加できるよう、準備だけしている状態
 ]
+
+# CSRF_TRUSTED_ORIGINSに、バックエンドへのnginxへのアクセス先を追加 = これをやらないとdjangoAdmin画面にログインできない
+CSRF_TRUSTED_ORIGINS=[]
+CSRF_TRUSTED_ORIGINS.append(os.getenv("VITE_FRONT_HOST_ADDRESS"))

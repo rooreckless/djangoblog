@@ -5,8 +5,8 @@ FROM node:22.14.0-bullseye-slim
 # このディレクトリを基準にして、この後のRUNやCOPYが実行される。
 WORKDIR /app
 # build用ARG の定義
-ARG VITE_API_BASE_URL
-ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+ARG VITE_API_HOST_ADDRESS
+ENV VITE_API_HOST_ADDRESS=${VITE_API_HOST_ADDRESS}
 
 # npmパッケージのインストール開始
 COPY package*.json ./

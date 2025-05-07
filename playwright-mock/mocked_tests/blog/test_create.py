@@ -52,14 +52,14 @@ def handle_blog_create_500(route: Route, request: Request):
 #---テストケース---
 def test_create_blog_success(page: Page):
     """正常系"""
-    base_url = os.environ.get("BASE_URL")
+    front_host_address = os.environ.get("VITE_FRONT_HOST_ADDRESS_FOR_PLAYWRIGHT")
     # ブログ作成api(のモック)を準備: POST /api/v1/blogs/ に対して成功レスポンスを返す
     page.route("**/api/v1/blogs/", handle_blog_create_201)
 
     # フロントエンドの作成画面へ遷移
     # page.goto("http://frontend:5173/blogs/create")
     # page.goto('http://front_nginx/blogs/create')
-    page.goto(f"{base_url}/blogs/create")
+    page.goto(f"{front_host_address}/blogs/create")
 
     # 入力フォームにデータを入力
     page.get_by_test_id("blogcreate-input-title").fill("モックタイトル")
@@ -71,19 +71,19 @@ def test_create_blog_success(page: Page):
     # 成功した場合の挙動を検証 = ブログ一覧ページに戻っているはず
     # expect(page).to_have_url("http://frontend:5173/blogs")
     # expect(page).to_have_url("http://front_nginx/blogs")
-    expect(page).to_have_url(f"{base_url}/blogs")
+    expect(page).to_have_url(f"{front_host_address}/blogs")
 
 
 
 def test_blog_create_success_request_response(page: Page):
     """バックエンドからのリクエストとレスポンスを検証し、その内容からフロントエンドの挙動を確認する"""
-    base_url = os.environ.get("BASE_URL")
+    front_host_address = os.environ.get("VITE_FRONT_HOST_ADDRESS_FOR_PLAYWRIGHT")
     # ブログ作成apiのモックを準備(正常系)
     page.route("**/api/v1/blogs/", handle_blog_create_201)
     # ブログ作成ページへ遷移
     # page.goto("http://frontend:5173/blogs/create")
     # page.goto('http://front_nginx/blogs/create')
-    page.goto(f"{base_url}/blogs/create")
+    page.goto(f"{front_host_address}/blogs/create")
 
     # フォームに入力
     page.get_by_test_id("blogcreate-input-title").fill("モックタイトル")
@@ -114,7 +114,7 @@ def test_blog_create_success_request_response(page: Page):
     # ブログ一覧ページに遷移していることを確認する
     # expect(page).to_have_url("http://frontend:5173/blogs")
     # expect(page).to_have_url("http://front_nginx/blogs")
-    expect(page).to_have_url(f"{base_url}/blogs")
+    expect(page).to_have_url(f"{front_host_address}/blogs")
     expect(page.get_by_test_id("bloglist-section-title")).to_have_text("ブログ一覧")
     # ブログ作成画面のエラーメッセージは表示されていないはず。
     expect(page.get_by_test_id("blogcreate-backend-error-message")).not_to_be_visible()
@@ -122,12 +122,12 @@ def test_blog_create_success_request_response(page: Page):
 
 def test_blog_create_with_invalid_input(page: Page):
     """バリデーションエラー タイトル、本文ともに入力しない場合"""
-    base_url = os.environ.get("BASE_URL")
+    front_host_address = os.environ.get("VITE_FRONT_HOST_ADDRESS_FOR_PLAYWRIGHT")
     # このテストケースではブログ作成apiのモックをしてもしなくても結果が変わらないが一応準備
     page.route("**/api/v1/blogs/", handle_blog_create_invalid_input)
     # page.goto("http://frontend:5173/blogs/create")
     # page.goto('http://front_nginx/blogs/create')
-    page.goto(f"{base_url}/blogs/create")
+    page.goto(f"{front_host_address}/blogs/create")
 
     # 何も入力しない状態だと送信ボタンをクリックできないはず
     # page.get_by_test_id("blogcreate-submit-btn").click()
@@ -136,12 +136,12 @@ def test_blog_create_with_invalid_input(page: Page):
 
 def test_create_blog_with_title_too_long(page: Page):
     """バリデーションエラー タイトルの文字列が長すぎる場合"""
-    base_url = os.environ.get("BASE_URL")
+    front_host_address = os.environ.get("VITE_FRONT_HOST_ADDRESS_FOR_PLAYWRIGHT")
     # このテストケースではブログ作成apiのモックをしてもしなくても結果が変わらないが一応準備
     page.route("**/api/v1/blogs/", handle_blog_create_201)
     # page.goto("http://frontend:5173/blogs/create")
     # page.goto('http://front_nginx/blogs/create')
-    page.goto(f"{base_url}/blogs/create")
+    page.goto(f"{front_host_address}/blogs/create")
 
     # 201文字のタイトルを入力
     long_title = "あ" * 201
@@ -171,12 +171,12 @@ def test_create_blog_with_title_too_long(page: Page):
 
 def test_blog_create_request_payload(page: Page):
     """バリデーションエラー タイトルの文字列が長すぎる場合"""
-    base_url = os.environ.get("BASE_URL")
+    front_host_address = os.environ.get("VITE_FRONT_HOST_ADDRESS_FOR_PLAYWRIGHT")
     # このテストケースではブログ作成apiのモックをしてもしなくても結果が変わらないが一応準備
     page.route("**/api/v1/blogs/", handle_blog_create_201)
     # page.goto("http://frontend:5173/blogs/create")
     # page.goto('http://front_nginx/blogs/create')
-    page.goto(f"{base_url}/blogs/create")
+    page.goto(f"{front_host_address}/blogs/create")
     # フィールドに値を入力
     page.get_by_test_id("blogcreate-input-title").fill("テストタイトル")
     page.get_by_test_id("blogcreate-textarea-contents-text").fill("テスト本文")
@@ -201,12 +201,12 @@ def test_blog_create_request_payload(page: Page):
 ])
 def test_blog_create_failedcase_response_data(page: Page,handler, error_message, expect_backend_status):
     """バックエンドからのエラーレスポンスが帰ってきた時のフロントエンドの挙動を確認する"""
-    base_url = os.environ.get("BASE_URL")
+    front_host_address = os.environ.get("VITE_FRONT_HOST_ADDRESS_FOR_PLAYWRIGHT")
     page.route("**/api/v1/blogs/", handler)
 
     # page.goto("http://frontend:5173/blogs/create")
     # page.goto('http://front_nginx/blogs/create')
-    page.goto(f"{base_url}/blogs/create")
+    page.goto(f"{front_host_address}/blogs/create")
 
     # 入力
     page.get_by_test_id("blogcreate-input-title").fill("テストタイトル")

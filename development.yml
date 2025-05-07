@@ -9,8 +9,8 @@ services:
       dockerfile: ./dockerfile/development/Dockerfile
       args:
         # npm run build時に使う環境変数 = バックエンドへのfetch先
-        # ここに記述するので、.envs/development/frontendからはVITE_API_BASE_URLは削除する
-        VITE_API_BASE_URL: http://localhost:8000
+        # ここに記述するので、.envs/development/frontendからはVITE_API_HOST_ADDRESSは削除する
+        VITE_API_HOST_ADDRESS: http://localhost:8000
     env_file:
       - ./.envs/development/frontend
     working_dir: /app
@@ -30,8 +30,13 @@ services:
       - "8080:80"
     volumes:
       - ./frontend/dist:/usr/share/nginx/html:ro
-      - ./front_nginx/nginx_confs/development/nginx.conf:/etc/nginx/nginx.conf
+      - ./front_nginx/development/nginx.conf:/etc/nginx/nginx.conf
+      - ./backend/static:/static  # ← これを追加 adminやapi/docs用cssを
+      # docker compose -f development.yml exec backend_gunicorn python manage.py collectstatic --noinput
+      # で作成したのでマウントしている
     restart: always
+    depends_on:
+      - backend_gunicorn
   playwright-mock:
     build:
       context: .
@@ -59,6 +64,7 @@ services:
         condition: service_healthy
     env_file:
       - ./.envs/development/django
+      - ./.envs/development/frontend
       - ./.envs/development/postgres
     working_dir: /app
     volumes:
