@@ -165,9 +165,9 @@ USE_I18N = True
 
 STATIC_URL = 'static/'  # バックエンドが提供する静的ファイルに関して、（=ブラウザから）からのアクセスを受け付けるURLパス
 STATIC_ROOT = os.path.join(BASE_DIR, "static", "default") #collectstatic によってファイルがコピーされる実ファイルの保存先
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static", "my_images") # backend/static/default以外にも追加したい静的ファイルがあれば、backend/static/my_imagesにいれる
-]
+
+# STATICFILES_DIRSは、そのリストのパスにも画像やcss,jsがあれば、collectstaticコマンド実行時に、STATIC_ROOTにコピーされるの意味だった。
+# 現状では「他に静的ファイルを溜め込んでいるディレクトリ」とかがないので削除する
 
 
 # Default primary key field type

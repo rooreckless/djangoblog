@@ -414,9 +414,11 @@ playwright-real/e2e_tests/test-results
 playwright-mock/mocked_tests/result
 playwright-mock/mocked_tests/test-results
 
-# backend/static/default = python manage.py collectstatic --no-inputの実行結果の静的ファイル群
-# ただし、空ディレクトリでもgitに上げたいのでgitkeepもいれておきます。.gitkeep自体も上がってほしいので記載
-backend/static/*
-!/backend/static/.gitkeep   # 空ディレクトリ保持用（任意）
-!/backend/static/default/.gitkeep  # defaultディレクトリは保持してもよい
-!/backend/static/my_images/.gitkeep   # 空ディレクトリ保持用（任意）
+# backend/static/default = python manage.py collectstatic --no-inputの実行結果の静的ファイルがあつまるディレクトリ
+# collectstatic実行後は大量の静的ファイルがそのディレクトリにできてしまうが、それはリポジトリに上がってほしくないので.gitignoreにいれる
+# *だけでなく、**にしたのは、default直下のファイル・ディレクトリだけでなく、default内のファイル・ディレクトリを再帰的にignoreするため
+backend/static/default/**
+# collectstatic実行前は空ディレクトリだが、ディレクトリ自体は空っぽのままでgitに上げたいので
+#.gitkeepをdefaultに作成し、その.gitkeepはignoreされないように除外(!)にします。
+!backend/static/default/.gitkeep
+# backend/staticディレクトリには.gitkeepを作成する必要はないです。 = defaultディレクトリがあるから空っぽじゃないから。

@@ -30,8 +30,7 @@ services:
     container_name: djangoblog_local_backend
     restart: always
     user: "${UID:-1000}:${GID:-1000}"
-    # depends_on:
-    #   - postgres
+    # backendのコンテナの起動にはpostgresコンテナの正常起動完了が条件が条件 = 単なる起動順ではない
     depends_on:
       postgres:
         condition: service_healthy
@@ -82,7 +81,7 @@ services:
     volumes:
       - ./playwright-mock:/app  # ← テストケースファイルはこの中のe2e_testsディレクトリだが、test_resultsもここに作成される
     # entrypoint: [ "tail", "-f", "/dev/null" ]  # デバッグ用。任意で変更可。
-  # nginx:
+  # front_nginx:
   #   image: nginx:latest
   #   container_name: djangoblog_local_nginx
   #   restart: always
