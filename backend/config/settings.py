@@ -37,7 +37,7 @@ ALLOWED_HOSTS = [
     # "frontend", # ← なくてもテストは可能
 ]
 # envsに入っている内容も足す
-ALLOWED_HOSTS+os.getenv("DJANGO_ALLOWED_HOSTS").split(',')
+ALLOWED_HOSTS=ALLOWED_HOSTS+os.getenv("DJANGO_ALLOWED_HOSTS").split(',')
 
 # Application definition
 
