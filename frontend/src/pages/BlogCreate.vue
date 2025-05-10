@@ -46,7 +46,7 @@ import { ref, computed } from "vue"
 import { useRouter } from "vue-router"
 import { useForm, useField } from 'vee-validate'
 import * as yup from 'yup'
-
+const baseURL = import.meta.env.VITE_API_HOST_ADDRESS;
 // スキーマ定義=フォーム内パーツのバリデーションルールを定義し、yup ライブラリを使用してスキーマを作成
 // titleについては、必須項目であること、最大文字数200文字であることを指定
 // contents_textについては、必須項目であることを指定
@@ -81,7 +81,7 @@ const submitBlog = handleSubmit (async (form_values) => {
     try {
         // バックエンドへPOSTリクエスト 第2引数がオブジェクトで、バックエンドへ渡す内容
         // オブジェクトのbodyについては、「refで定義した変数 = フォームのinputやtextareaの記述内容」からオブジェクトを作成 → 「JSON.stringifyで文字列化した結果」がbodyの値になっている
-        const response = await fetch("http://localhost:8000/api/v1/blogs/", {
+        const response = await fetch(`${baseURL}/api/v1/blogs/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
