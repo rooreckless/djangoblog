@@ -33,7 +33,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRoute,useRouter } from "vue-router";
-
+const baseURL = import.meta.env.VITE_API_HOST_ADDRESS;
 // interface
 interface Blog {
   id: number
@@ -47,7 +47,7 @@ const router = useRouter()
 
 onMounted(async () => {
   const id = route.params.id;
-  const response = await fetch(`http://localhost:8000/api/v1/blogs/${id}/`);
+  const response = await fetch(`${baseURL}/api/v1/blogs/${id}/`);
   blog.value = await response.json();
 });
 
