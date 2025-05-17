@@ -1,0 +1,61 @@
+# CodeBuildが使う、ビルド時に実行する内容
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      docker: 20
+    commands:
+      - echo "[Install] Installing dependencies"
+      - yum install -y jq git
+
+  pre_build:
+    commands:
+      - echo "[PreBuild] Checking environment"
+      - echo $CODEBUILD_SRC_DIR
+      - echo "[PreBuild] Fetching env files from Parameter Store"
+      # 環境変数ファイル・ディレクトリを作成
+      - mkdir -p .envs/development
+      # 環境変数ファイルはparamterstoreからget-paramterを--with-decryptionつきで実施 -> ファイルへ出力
+      - aws ssm get-parameter --name djangoblog_envs_development_frontend --with-decryption \
+        --query "Parameter.Value" --output text > .envs/development/frontend
+
+      - aws ssm get-parameter --name djangoblog_envs_development_django --with-decryption \
+        --query "Parameter.Value" --output text > .envs/development/django
+
+      - aws ssm get-parameter --name djangoblog_envs_development_postgres --with-decryption \
+        --query "Parameter.Value" --output text > .envs/development/postgres
+      # -- 環境変数ファイルの内、EC2のパブリックIPアドレスが必要なところを書き換える --
+      - echo "[PreBuild] Fetching EC2 Public IP"
+      # 起動しているEC2インスタンスのIDをaws-cliで取得
+      - INSTANCE_ID=$(aws ec2 describe-instances \
+          --filters "Name=tag:Name,Values=MyAppEc2" \
+          --query "Reservations[0].Instances[0].InstanceId" \
+          --output text)
+      # そのEC2インスタンスのパブリックIPを取得
+      - PUBLIC_IP=$(aws ec2 describe-instances \
+          --instance-ids $INSTANCE_ID \
+          --query "Reservations[0].Instances[0].PublicIpAddress" \
+          --output text)
+      - echo "Detected Public IP: $PUBLIC_IP"
+      - echo "[PreBuild] Patching env files with PUBLIC_IP"
+      # 書き換え開始
+      - sed -i "s|DJANGO_ALLOWED_HOSTS=.*|DJANGO_ALLOWED_HOSTS=$PUBLIC_IP|" .envs/development/django
+      - sed -i "s|VITE_API_HOST_ADDRESS=.*|VITE_API_HOST_ADDRESS=http://$PUBLIC_IP/api|" .envs/development/frontend
+      - sed -i "s|VITE_FRONT_HOST_ADDRESS=.*|VITE_FRONT_HOST_ADDRESS=http://$PUBLIC_IP|" .envs/development/frontend
+
+  build:
+    commands:
+      - echo "[Build] Running Docker Compose build"
+      - docker compose -f development.yml build
+
+  post_build:
+    commands:
+      - echo "[PostBuild] Preparing artifacts for deployment"
+      - mkdir -p output
+      - cp aws_deploy/appspec.yml output/
+      - cp -r scripts output/
+artifacts:
+  files:
+    - output/**/*
+  base-directory: output
