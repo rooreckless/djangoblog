@@ -60,5 +60,5 @@ phases:
       - find output
 artifacts:
   files:
-    - output/**/*
-  base-directory: output
+    - '**/*'            # 🔍 output/ (=base-directoryの内容)以下のすべてのファイルを対象にする
+  base-directory: output # ✅ output/ をルートとする
