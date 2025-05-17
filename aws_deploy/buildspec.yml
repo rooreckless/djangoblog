@@ -7,8 +7,11 @@ phases:
     #   docker: 20
     commands:
       - echo "[Install] Installing dependencies"
-      - yum install -y jq git
-
+      - apt-get update
+      - apt-get install -y jq git
+      - which git
+      - which jq
+      - jq --version
   pre_build:
     commands:
       - echo "[PreBuild] Checking environment"
