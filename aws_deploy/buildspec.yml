@@ -55,7 +55,8 @@ phases:
       - echo "[PostBuild] Preparing artifacts for deployment"
       - mkdir -p output
       - cp aws_deploy/appspec.yml output/
-      - cp -r scripts output/
+        
+      - cp -r aws_deploy/scripts output/
 artifacts:
   files:
     - output/**/*
