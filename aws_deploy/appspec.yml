@@ -6,8 +6,14 @@ files:
     destination: /home/ec2-user/app
     overwrite: true
 
+# hooks:
+#   AfterInstall:
+#     - location: aws_deploy/scripts/deploy.sh
+#       timeout: 300
+#       runas: ec2-user
+
 hooks:
-  AfterInstall:
+  BeforeInstall:
     - location: aws_deploy/scripts/deploy.sh
       timeout: 300
       runas: ec2-user
