@@ -55,6 +55,7 @@ phases:
       - echo "[PostBuild] Preparing artifacts for deployment"
       - mkdir -p output
       - rsync -av --exclude output ./ output/
+      - cp output/aws_deploy/appspec.yml output/appspec.yml
       - echo "[PostBuild] Listing output directory"
       - find output
 artifacts:
