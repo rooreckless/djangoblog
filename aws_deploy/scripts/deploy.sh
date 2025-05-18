@@ -4,9 +4,16 @@ set -e
 echo "[deploy.sh] Starting application setup..."
 
 sudo dnf install -y tree
+
+echo "[deploy.sh] tree default"
 pwd
 ls -la
-echo "[deploy.sh] tree default"
+tree . -a
+
+echo "[deploy.sh] tree top"
+cd /
+pwd
+ls -la
 tree . -a
 
 echo "[deploy.sh] tree cded"
