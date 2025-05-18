@@ -7,13 +7,13 @@ sudo dnf install -y tree
 pwd
 ls -la
 echo "[deploy.sh] tree default"
-tree .
+tree . -a
 
 echo "[deploy.sh] tree cded"
 cd /home/ec2-user/app
 pwd
 ls -la
-tree .
+tree . -a
 
 
 # Docker Compose 再起動（本番用のcomposeファイルがあればそちらに変更）
