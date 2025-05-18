@@ -5,7 +5,7 @@ files:
   - source: .
     destination: /home/ec2-user/app
     overwrite: true
-
+    flatten: true
 # hooks:
 #   AfterInstall:
 #     - location: aws_deploy/scripts/deploy.sh
