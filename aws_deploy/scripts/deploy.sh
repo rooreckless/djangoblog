@@ -1,9 +1,20 @@
 #!/bin/bash
 set -e
 
-cd /home/ec2-user/app
-
 echo "[deploy.sh] Starting application setup..."
+
+sudo dnf install -y tree
+pwd
+ls -la
+echo "[deploy.sh] tree default"
+tree .
+
+echo "[deploy.sh] tree cded"
+cd /home/ec2-user/app
+pwd
+ls -la
+tree .
+
 
 # Docker Compose 再起動（本番用のcomposeファイルがあればそちらに変更）
 docker compose -f development.yml down || true
