@@ -14,6 +14,10 @@ phases:
       - jq --version
   pre_build:
     commands:
+      - echo "[PreBuild] Logging into Docker Hub"
+      - export DOCKER_USERNAME=$(aws ssm get-parameter --name dockerhub_username --query "Parameter.Value" --output text)
+      - export DOCKER_PASSWORD=$(aws ssm get-parameter --name dockerhub_password --with-decryption --query "Parameter.Value" --output text)
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - echo "[PreBuild] Checking environment"
       - echo $CODEBUILD_SRC_DIR
       - echo "[PreBuild] Fetching env files from Parameter Store"
