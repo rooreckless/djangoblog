@@ -54,10 +54,7 @@ phases:
     commands:
       - echo "[PostBuild] Preparing artifacts for deployment"
       - mkdir -p output
-      # - cp aws_deploy/appspec.yml output/
-      # - cp -r aws_deploy/scripts output/
-      #全ディレクトリをCodeDeployにわたすように修正
-      - cp -r * output/
+      - rsync -av --exclude output ./ output/
       - echo "[PostBuild] Listing output directory"
       - find output
 artifacts:
