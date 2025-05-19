@@ -1,0 +1,19 @@
+# CodeDeployが、EC2側、どのスクリプトをどう実行するか
+version: 0.0
+os: linux
+files:
+  - source: .
+    destination: /home/ec2-user/app
+    overwrite: true
+    flatten: true
+# hooks:
+#   AfterInstall:
+#     - location: aws_deploy/scripts/deploy.sh
+#       timeout: 300
+#       runas: ec2-user
+
+hooks:
+  AfterInstall:
+    - location: aws_deploy/scripts/deploy.sh
+      timeout: 300
+      runas: ec2-user

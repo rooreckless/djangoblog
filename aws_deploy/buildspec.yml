@@ -1,0 +1,78 @@
+# CodeBuildが使う、ビルド時に実行する内容
+version: 0.2
+
+phases:
+  install:
+    # runtime-versions:
+    #   docker: 20
+    commands:
+      - echo "[Install] Installing dependencies"
+      - apt-get update
+      - apt-get install -y jq git
+      - which git
+      - which jq
+      - jq --version
+  pre_build:
+    commands:
+      - echo "[PreBuild] Logging into Docker Hub"
+      - export DOCKER_USERNAME=$(aws ssm get-parameter --name dockerhub_username --query "Parameter.Value" --output text)
+      - export DOCKER_PASSWORD=$(aws ssm get-parameter --name dockerhub_password --with-decryption --query "Parameter.Value" --output text)
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - echo "[PreBuild] Checking environment"
+      - echo $CODEBUILD_SRC_DIR
+      - echo "[PreBuild] Fetching env files from Parameter Store"
+      # 環境変数ファイル・ディレクトリを作成
+      - mkdir -p .envs/development
+      # 環境変数ファイルはparamterstoreからget-paramterを--with-decryptionつきで実施 -> ファイルへ出力
+      - aws ssm get-parameter --name djangoblog_envs_development_frontend --with-decryption --query "Parameter.Value" --output text > .envs/development/frontend
+
+      - aws ssm get-parameter --name djangoblog_envs_development_django --with-decryption --query "Parameter.Value" --output text > .envs/development/django
+
+      - aws ssm get-parameter --name djangoblog_envs_development_postgres --with-decryption --query "Parameter.Value" --output text > .envs/development/postgres
+      # -- 環境変数ファイルの内、EC2のパブリックIPアドレスが必要なところを書き換える --
+      - echo "[PreBuild] Fetching EC2 Public IP"
+      # 起動しているEC2インスタンスのIDをaws-cliで取得
+      - |
+        INSTANCE_ID=$(aws ec2 describe-instances \
+          --filters "Name=tag:Name,Values=MyAppEc2" \
+          --query "Reservations[0].Instances[0].InstanceId" \
+          --output text)
+        # そのEC2インスタンスのパブリックIPを取得
+        PUBLIC_IP=$(aws ec2 describe-instances \
+          --instance-ids $INSTANCE_ID \
+          --query "Reservations[0].Instances[0].PublicIpAddress" \
+          --output text)
+        echo "Detected Public IP: $PUBLIC_IP"
+        echo "[PreBuild] Patching env files with PUBLIC_IP"
+        # 書き換え開始
+        sed -i "s|DJANGO_ALLOWED_HOSTS=.*|DJANGO_ALLOWED_HOSTS=$PUBLIC_IP|" .envs/development/django
+        sed -i "s|VITE_API_HOST_ADDRESS=.*|VITE_API_HOST_ADDRESS=http://$PUBLIC_IP:8080|" .envs/development/frontend
+        sed -i "s|VITE_FRONT_HOST_ADDRESS=.*|VITE_FRONT_HOST_ADDRESS=http://$PUBLIC_IP:8080|" .envs/development/frontend
+
+  build:
+    commands:
+      - echo "[Build] Fixing permissions for docker build context"
+      - chown -R 1000:1000 .
+      - echo "[Build] Running Docker Compose build frontend container"
+      - docker compose -f development.yml run --rm frontend
+
+  post_build:
+    commands:
+      - echo "[PostBuild] Preparing artifacts for deployment"
+      - mkdir -p output
+      - echo "[PostBuild] Listing output directory before rsync"
+      - pwd
+      - ls -la .
+      - ls -la output
+      - rsync -av --exclude output ./ output/
+      - cp aws_deploy/appspec.yml output/appspec.yml
+      - echo "[PostBuild] Listing output directory after rsync"
+      - pwd
+      - ls -la .
+      - ls -la output
+      - echo "[PostBuild] Listing output directory"
+      - find output
+artifacts:
+  files:
+    - '**/*'            # 🔍 output/ (=base-directoryの内容)以下のすべてのファイルを対象にする
+  base-directory: output # ✅ output/ をルートとする
