@@ -51,6 +51,8 @@ phases:
 
   build:
     commands:
+      - echo "[Build] Fixing permissions for docker build context"
+      - chown -R 1000:1000 .
       - echo "[Build] Running Docker Compose build frontend container"
       - docker compose -f development.yml run --rm frontend
 
