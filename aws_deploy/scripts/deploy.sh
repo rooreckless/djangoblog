@@ -27,14 +27,15 @@ tree . -a -L 3 > /tmp/tree3.log 2>&1
 
 
 # Docker Compose 再起動（本番用のcomposeファイルがあればそちらに変更）
+echo "[deploy.sh] Docker containers down"
 docker compose -f development.yml down || true
-docker compose -f development.yml pull
-docker compose -f development.yml up -d --build
-
-echo "[deploy.sh] Docker containers are up."
+echo "[deploy.sh] Docker containers build & up -d"
+docker compose -f development.yml build
+docker compose -f development.yml up -d
+echo "[deploy.sh] Docker containers are uped."
 
 # 必要に応じてマイグレーションや静的ファイル収集
-docker compose -f development.yml exec -T backend python manage.py migrate --noinput
-docker compose -f development.yml exec -T backend python manage.py collectstatic --noinput
+# docker compose -f development.yml exec -T backend python manage.py migrate --noinput
+# docker compose -f development.yml exec -T backend python manage.py collectstatic --noinput
 
 echo "[deploy.sh] Deploy completed."
