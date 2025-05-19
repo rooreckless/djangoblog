@@ -58,9 +58,15 @@ phases:
     commands:
       - echo "[PostBuild] Preparing artifacts for deployment"
       - mkdir -p output
-      
+      - echo "[PostBuild] Listing output directory before rsync"
+      - pwd
+      - ls -la .
+      - ls -la output
       - rsync -av --exclude output ./ output/
       - cp aws_deploy/appspec.yml output/appspec.yml
+      - echo "[PostBuild] Listing output directory after rsync"
+      - pwd
+      - ls -la .
       - ls -la output
       - echo "[PostBuild] Listing output directory"
       - find output
