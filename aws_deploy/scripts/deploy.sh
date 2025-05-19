@@ -3,8 +3,8 @@ set -e
 set -x  # ← 追加：実行されるコマンドをすべて出力
 echo "[deploy.sh] Starting application setup..."
 
-sudo mkdir -p /home/ec2-user/app
-sudo chown ec2-user:ec2-user /home/ec2-user/app
+# sudo mkdir -p /home/ec2-user/app
+# sudo chown ec2-user:ec2-user /home/ec2-user/app
 
 sudo dnf install -y tree
 
