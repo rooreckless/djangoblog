@@ -45,7 +45,7 @@ phases:
         echo "Detected Public IP: $PUBLIC_IP"
         echo "[PreBuild] Patching env files with PUBLIC_IP"
         # 書き換え開始
-        sed -i "s|DJANGO_ALLOWED_HOSTS=.*|DJANGO_ALLOWED_HOSTS=$PUBLIC_IP:8080|" .envs/development/django
+        sed -i "s|DJANGO_ALLOWED_HOSTS=.*|DJANGO_ALLOWED_HOSTS=$PUBLIC_IP|" .envs/development/django
         sed -i "s|VITE_API_HOST_ADDRESS=.*|VITE_API_HOST_ADDRESS=http://$PUBLIC_IP:8080|" .envs/development/frontend
         sed -i "s|VITE_FRONT_HOST_ADDRESS=.*|VITE_FRONT_HOST_ADDRESS=http://$PUBLIC_IP:8080|" .envs/development/frontend
 
