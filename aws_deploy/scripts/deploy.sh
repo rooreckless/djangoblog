@@ -35,7 +35,9 @@ docker compose -f development.yml up -d
 echo "[deploy.sh] Docker containers are uped."
 
 # 必要に応じてマイグレーションや静的ファイル収集
-# docker compose -f development.yml exec -T backend python manage.py migrate --noinput
-# docker compose -f development.yml exec -T backend python manage.py collectstatic --noinput
+docker compose -f development.yml exec -T backend python manage.py migrate --noinput
+docker compose -f development.yml exec -T backend python manage.py collectstatic --noinput
+# スーパーユーザー作成とサンプルデータ作成はEC2にログインして実施してください。
+
 
 echo "[deploy.sh] Deploy completed."

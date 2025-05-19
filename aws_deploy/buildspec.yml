@@ -51,8 +51,8 @@ phases:
 
   build:
     commands:
-      - echo "[Build] Running Docker Compose build"
-      - docker compose -f development.yml build
+      - echo "[Build] Running Docker Compose build frontend container"
+      - docker compose -f development.yml run --rm frontend
 
   post_build:
     commands:
