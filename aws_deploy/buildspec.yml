@@ -1,10 +1,12 @@
 # CodeBuildが使う、ビルド時に実行する内容
+# template.ymlのType: AWS::CodeBuild::ProjectなリソースCodeBuildProjectで、Source.BuildSpecでこのymlを指定している
 version: 0.2
 
 phases:
+  # phasesはCodebuildが各フェーズでそれぞれ実行することを示す。
+  # Codebuildのライフサイクルにおいて、各フェーズは　https://qiita.com/hiroaki-u/items/b527264093eeb1e406e2#codebuild-1
+  # buildpsec.ymlに記述できるのは、以下のようにinstall ,prebuild,build,post_buildのみ
   install:
-    # runtime-versions:
-    #   docker: 20
     commands:
       - echo "[Install] Installing dependencies"
       - apt-get update
