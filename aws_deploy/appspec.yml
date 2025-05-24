@@ -14,3 +14,25 @@ hooks:
     - location: aws_deploy/scripts/deploy.sh
       timeout: 300
       runas: ec2-user
+
+# デプロイ先のEC2の/opt/codedeploy-agent/deployment-rootの中身について
+
+# 54c7fbda-2fb5-462d-98df-94ee1a0b8ed1
+# これは CodeDeploy Deployment ID に対応するディレクトリです。
+# Deployment ID は、AWS 側で CodeDeploy がデプロイごとに自動生成する 一意の識別子（UUID）。
+# この ID は CodePipeline や CodeDeploy のイベントログにも出てきます
+
+# deployment-instructions
+# 現在の・過去のデプロイステップの進行情報を保存しています。
+# ステートマシン的な動作に必要なメタ情報（ステップごとの結果など）。
+# 通常、JSONファイルで構成されており、デプロイ処理中やトラブル時に解析対象になります。
+
+# deployment-logs
+# CodeDeploy Agent の全体ログ（codedeploy-agent.log など）を保存する領域。
+# 通常は /var/log/aws/codedeploy-agent/ ですが、一部状態がここに記録される場合もあります
+
+# ongoing-deployment
+# 現在進行中のデプロイのステータスファイルです。
+# このファイルが存在する = 「デプロイ中」もしくは「途中で停止して不正終了」したことを意味します。
+# CodeDeploy Agent はこのファイルを使って「同時デプロイ防止」や「中断処理の再実行判断」を行います。
+# 💡 デプロイ完了後は通常このファイルは削除されるべきです。残っていた場合は異常終了の疑いあり。

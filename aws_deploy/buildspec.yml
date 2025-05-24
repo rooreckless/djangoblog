@@ -81,4 +81,4 @@ artifacts:
   files:
     - '**/*'            # output/ (=base-directoryの内容)以下のすべてのファイルを対象にする
   base-directory: output # CODEBUILD_SRC_DIR直下のoutput をルートとする
- 
+
