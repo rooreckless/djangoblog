@@ -11,14 +11,14 @@ phases:
       - echo "[installフェーズ]"
       - set -e
       - set -x  # ← 追加：実行されるコマンドをすべて出力
-      - pwd
+      # - pwd     # ← 出力は、/codebuild/output/srcランダムな数字/src
       # 以下の変数は」CodeBuildで最初から使える環境変数
       # https://docs.aws.amazon.com/ja_jp/codebuild/latest/userguide/build-env-ref-env-vars.html
-      - echo "CODEBUILD_SRC_DIR=$CODEBUILD_SRC_DIR"
-      - echo "CODEBUILD_BUILD_ID=$CODEBUILD_BUILD_ID"
-      - echo "CODEBUILD_BUILD_ARN=$CODEBUILD_BUILD_ARN"
-      - ls -la .
-      - apt-get update
+      - echo "CODEBUILD_SRC_DIR=$CODEBUILD_SRC_DIR"       # ← 出力はCODEBUILD_SRC_DIR=/codebuild/output/srcランダムな数字/src = codebuild実行直後のpwdと一緒
+      - echo "CODEBUILD_BUILD_ID=$CODEBUILD_BUILD_ID"     # ← 出力はCODEBUILD_BUILD_ID=MyAppBuild:uuid
+      - echo "CODEBUILD_BUILD_ARN=$CODEBUILD_BUILD_ARN"   # ← 出力は
+      # - ls -la .                                        # ← この時点でリポジトリの内容がカレントディレクトリに存在している。
+      - apt-get update                                    # ← このフェースの残りは必要なパッケージのインストールとアップデート
       - apt-get install -y jq git
       - which git
       - which jq
@@ -28,7 +28,7 @@ phases:
       - echo "[pre_buildフェーズ] docker-hubログイン"
       - export DOCKER_USERNAME=$(aws ssm get-parameter --name dockerhub_username --query "Parameter.Value" --output text)
       - export DOCKER_PASSWORD=$(aws ssm get-parameter --name dockerhub_password --with-decryption --query "Parameter.Value" --output text)
-      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin # dockerhubへログインをしない状態でcodebuildを使いまくると、dockerhubへのアクセス過剰でおちるので、対策としてdockerhubへログインしている
       - echo "[pre_buildフェーズ] 環境変数ファイル作成、値の取得と書換"
       # 環境変数ファイル・ディレクトリを作成
       - mkdir -p .envs/development
@@ -70,15 +70,16 @@ phases:
     commands:
       - echo "[post_buildフェーズ] CodeDeployへと渡すアーティファクトの準備"
       - mkdir -p output
-      - pwd
-      - ls -la .
-      - ls -la output
+      # - pwd               # ← この時点まででcdを実行していないので、pre_buildフェースのpwdと同じ場所である 
+      # - ls -la .          # ← この時点で、リポジトリの内容がカレントディレクトリに存在している。 
+      # - ls -la output     # ← この時点では、outputディレクトリは空っぽ
       - echo "[post_buildフェーズ] 現在のソースコード全体をoutputディレクトリにコピー"
-      - rsync -av --exclude output ./ output/
-      - cp aws_deploy/appspec.yml output/appspec.yml
-      - ls -la output
+      - rsync -av --exclude output ./ output/     # カレントディレクトリ内の全ファイル・ディレクトリを、outputディレクトリそのものは除き、outputディレクトリへコピー
+      - cp aws_deploy/appspec.yml output/appspec.yml  # appspec.yml自体は、outputディレクトリ直下にないといけないので、いどう
+      # - ls -la output     # ← outputディレクトリは、リポジトリの内容と、直下にappspec.ymlがある状態になっている
 artifacts:
-  files:
-    - '**/*'            # output/ (=base-directoryの内容)以下のすべてのファイルを対象にする
   base-directory: output # CODEBUILD_SRC_DIR直下のoutput をルートとする
+  files:
+    - '**/*'            # アーティファクト(= Codebuildとしての最終出力)は、base-directoryの内容のすべて(=output内(output自体は含まない))以下のすべてのファイルを対象にする
+  
 
