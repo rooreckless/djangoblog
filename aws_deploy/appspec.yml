@@ -1,19 +1,34 @@
 # CodeDeployが、EC2側、どのスクリプトをどう実行するか
+# https://docs.aws.amazon.com/ja_jp/codedeploy/latest/userguide/reference-appspec-file.html#appspec-hooks-location
+# https://docs.aws.amazon.com/ja_jp/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html
 version: 0.0
 os: linux
 files:
   - source: .
     destination: /home/ec2-user/app
     overwrite: true
-    flatten: true
-# hooks:
-#   AfterInstall:
-#     - location: aws_deploy/scripts/deploy.sh
-#       timeout: 300
-#       runas: ec2-user
+    # flatten: true #<- 使わないで。deploy.shでpwdが/のままでもdevelopment.ymlがみつかってしまう = destinationに関係なく、カレントディレクトリに勝手に展開している可能性がある
 
 hooks:
   AfterInstall:
     - location: aws_deploy/scripts/deploy.sh
       timeout: 300
       runas: ec2-user
+
+# デプロイ先のEC2の/opt/codedeploy-agent/deployment-rootの中身について
+
+# ランダムな英数のみのディレクトリ
+# この中に、CodeDeploy Deployment ID に対応するディレクトリ/logs/scripts.logがあるので、デバッグ用にはこれを確認する
+
+# deployment-instructions
+# 現在の・過去のデプロイステップの進行情報を保存しています。
+
+# deployment-logs
+# CodeDeploy Agent の全体ログ（codedeploy-agent.log など）を保存する領域。
+# 通常は /var/log/aws/codedeploy-agent/ ですが、一部状態がここに記録される場合もあります
+
+# ongoing-deployment
+# 現在進行中のデプロイのステータスファイルがあるディレクトリです。
+# ここにファイルが存在する = 「デプロイ中」もしくは「途中で停止して不正終了」したことを意味します。
+# CodeDeploy Agent はこのファイルを使って「同時デプロイ防止」や「中断処理の再実行判断」を行います。
+# # デプロイ完了後は通常このファイルは削除されるべきです。残っていた場合は異常終了の疑いあり。
