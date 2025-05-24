@@ -1,11 +1,9 @@
 #!/bin/bash
-set -e
-set -x  # ← 追加：実行されるコマンドをすべて出力
 echo "[deploy.sh] 実行開始"
 echo "[deploy.sh] カレントディレクトリの状況確認"
 pwd > /tmp/pwd1.log
 ls -la > /tmp/ls1.log
-# 
+ 
 
 
 # Docker Compose 再起動（本番用のcomposeファイルがあればそちらに変更）
