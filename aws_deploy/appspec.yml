@@ -7,7 +7,7 @@ files:
   - source: .
     destination: /home/ec2-user/app
     # overwrite: true
-    # flatten: true
+    flatten: true
 
 hooks:
   AfterInstall:

@@ -7,8 +7,9 @@ pwd > /tmp/pwd1.log         # <- この出力は /
 ls -la > /tmp/ls1.log       # この中に、development.ymlが存在しない。あるとしたら、/home/ec2-user/appの中
 echo $(pwd)
 echo $(ls -la)
-# cd /home/ec2-user/app
-
+cd /home/ec2-user/app
+echo $(pwd)
+echo $(ls -la)
 
 # Docker Compose 再起動（本番用のcomposeファイルがあればそちらに変更）
 echo "[deploy.sh] コンテナを停止"
