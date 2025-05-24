@@ -1,8 +1,9 @@
 #!/bin/bash
+# このスクリプト(codedeployのappspec.ymlでは、set -xやset -eは使えないことを確認)
 echo "[deploy.sh] 実行開始"
 echo "[deploy.sh] カレントディレクトリの状況確認"
-pwd > /tmp/pwd1.log
-ls -la > /tmp/ls1.log
+pwd > /tmp/pwd1.log         # <- この出力は /
+ls -la > /tmp/ls1.log       # この中に、development.ymlが存在しない。あるとしたら、/home/ec2-user/appの中
  
 
 

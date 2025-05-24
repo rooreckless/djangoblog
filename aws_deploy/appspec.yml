@@ -1,11 +1,13 @@
 # CodeDeployが、EC2側、どのスクリプトをどう実行するか
+# https://docs.aws.amazon.com/ja_jp/codedeploy/latest/userguide/reference-appspec-file.html#appspec-hooks-location
+# https://docs.aws.amazon.com/ja_jp/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html
 version: 0.0
 os: linux
-files:
-  - source: .
-    destination: /home/ec2-user/app
-    overwrite: true
-    flatten: true
+# files:
+#   - source: .
+#     destination: /home/ec2-user/app
+#     overwrite: true
+#     flatten: true
 
 hooks:
   AfterInstall:
