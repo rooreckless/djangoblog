@@ -15,6 +15,8 @@ phases:
       # 以下の変数は」CodeBuildで最初から使える環境変数
       # https://docs.aws.amazon.com/ja_jp/codebuild/latest/userguide/build-env-ref-env-vars.html
       - echo "CODEBUILD_SRC_DIR=$CODEBUILD_SRC_DIR"
+      - echo "CODEBUILD_BUILD_ID=$CODEBUILD_BUILD_ID"
+      - echo "CODEBUILD_BUILD_ARN=$CODEBUILD_BUILD_ARN"
       - ls -la .
       - apt-get update
       - apt-get install -y jq git
@@ -76,7 +78,7 @@ phases:
       - cp aws_deploy/appspec.yml output/appspec.yml
       - ls -la output
 artifacts:
-  base-directory: output # CODEBUILD_SRC_DIR直下のoutput をルートとする
   files:
-    - '**/*'            # 🔍 output/ (=base-directoryの内容)以下のすべてのファイルを対象にする
-  
+    - '**/*'            # output/ (=base-directoryの内容)以下のすべてのファイルを対象にする
+  base-directory: output # CODEBUILD_SRC_DIR直下のoutput をルートとする
+ 
