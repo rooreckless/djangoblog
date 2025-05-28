@@ -1,0 +1,36 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - $(aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY)
+     
+      - echo Fetching frontend environment file from SSM Parameter Store...
+       #パラメータストアから環境変数ファイルを生成
+      - mkdir -p .env/.development
+      - |
+        aws ssm get-parameter \
+          --name "djangoblog_envs_development_frontend" \
+          --with-decryption \
+          --region $AWS_REGION \
+          --query "Parameter.Value" \
+          --output text > .env/.development/frontend
+  build:
+    commands:
+      - echo Building frontend image...
+      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG ./frontend
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $ECR_REPO_URI:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo Pushing frontend image...
+      - docker push $ECR_REPO_URI:$IMAGE_TAG
+artifacts:
+  files:
+    - '**/*'
+
+# 中で使っている変数について : これらはCodeBuildのEnvironment.EvnironmentVariablesで設定している
+# AWS_REGION : ap-northeast-1
+# IMAGE_REPO_NAME	: fargate-backend or fargate-frontend
+# IMAGE_TAG	: latest(またはバージョン番号）
+# ECR_REPO_URI : <ランダムな>123456789012.dkr.ecr.ap-northeast-1.amazonaws.com/fargate-backend

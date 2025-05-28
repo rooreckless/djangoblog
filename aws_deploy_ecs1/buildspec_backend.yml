@@ -1,0 +1,68 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      #  ECR にログインするための一時的なパスワードを取得 | そのパスワードを使って、dockerがECRにログインさせる
+      # docker login についてはECRにログインの場合、ユーザー名は常に「AWS」で固定 & 一時的なパスワードは前のコマンドで得ているので、--password-stdinでよく、パスワードそのものはいらない
+      - $(aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY)
+      # 環境変数ファイル・ディレクトリを作成
+      - mkdir -p .envs/development
+      # 環境変数ファイルはparamterstoreからget-paramterを--with-decryptionつきで実施 -> ファイルへ出力
+      - aws ssm get-parameter --name djangoblog_envs_development_frontend --with-decryption --query "Parameter.Value" --output text > .envs/development/frontend
+
+      - aws ssm get-parameter --name djangoblog_envs_development_django --with-decryption --query "Parameter.Value" --output text > .envs/development/django
+
+      - aws ssm get-parameter --name djangoblog_envs_development_postgres --with-decryption --query "Parameter.Value" --output text > .envs/development/postgres
+  build:
+    commands:
+      - echo Building backend image...
+      # バックエンドのDockerイメージをビルドしてタグを書き換え
+      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG ./backend
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $ECR_REPO_URI:$IMAGE_TAG
+      # 
+      - echo "タスク定義書 taskdef.jsonへ書き込み開始..."
+      # フロントとバックのタスク定義書をここで作成している(このymlはバックエンド用なんだけど)
+      - |
+        cat > imagedefinitions.json <<EOF
+        [
+          {
+            "name": "frontend",
+            "imageUri": "${FRONTEND_REPO_URI}:${IMAGE_TAG}"
+          },
+          {
+            "name": "backend",
+            "imageUri": "${ECR_REPO_URI}:${IMAGE_TAG}"
+          }
+        ]
+        EOF
+      - echo "CodeDeployが使う appspec.ymlへ書き込み開始...""
+      - |
+        cat > appspec.yml <<EOF
+        version: 1
+        Resources:
+          - TargetService:
+              Type: AWS::ECS::Service
+              Properties:
+                TaskDefinition: CombinedTaskDefinition
+                LoadBalancerInfo:
+                  ContainerName: frontend
+                  ContainerPort: 80
+        EOF
+  post_build:
+    commands:
+      # バックエンドのビルド済みイメージをECRへプッシュ
+      - echo Pushing backend image...
+      - docker push $ECR_REPO_URI:$IMAGE_TAG
+artifacts:
+  files:
+    # - '**/*'
+    - imagedefinitions.json
+    - appspec.yml
+
+# 中で使っている変数について : これらはCodeBuildのEnvironment.EvnironmentVariablesで設定している
+# AWS_REGION : ap-northeast-1
+# IMAGE_REPO_NAME	: fargate-backend or fargate-frontend
+# IMAGE_TAG	: latest(またはバージョン番号）
+# ECR_REPO_URI : <ランダムな>123456789012.dkr.ecr.ap-northeast-1.amazonaws.com/fargate-backend
