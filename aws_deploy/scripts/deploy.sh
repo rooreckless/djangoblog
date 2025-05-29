@@ -21,9 +21,9 @@ echo "[deploy.sh] コンテナ起動完了"
 
 # 必要に応じてマイグレーションや静的ファイル収集
 echo "[deploy.sh] バックエンド(gunicorn)コンテナ マイグレーション開始"
-docker compose -f development.yml run --rm backend_gunicorn python manage.py migrate
+docker compose -f development.yml run --rm backend python manage.py migrate
 echo "[deploy.sh] バックエンド(gunicorn)コンテナ collectstatic 開始"
-docker compose -f development.yml run --rm backend_gunicorn python manage.py collectstatic --noinput
+docker compose -f development.yml run --rm backend python manage.py collectstatic --noinput
 
 # スーパーユーザー作成とサンプルデータ作成はEC2にログインして実施してください。
 
