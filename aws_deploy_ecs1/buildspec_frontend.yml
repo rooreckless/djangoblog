@@ -1,0 +1,47 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - $(aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY)
+     
+      - echo "環境変数ファイルはparamterstoreからget-paramterを--with-decryptionつきで実施 -> ファイルへ出力"
+      # 環境変数ファイルはparamterstoreからget-paramterを--with-decryptionつきで実施 -> ファイルへ出力
+      - mkdir -p .env/.development
+      # - |
+      #   aws ssm get-parameter \
+      #     --name "djangoblog_envs_development_frontend" \
+      #     --with-decryption \
+      #     --region $AWS_REGION \
+      #     --query "Parameter.Value" \
+      #     --output text > .env/.development/frontend
+      - export VITE_API_HOST_ADDRESS=$(aws ssm get-parameter \
+        --name "/djangoblog/deploy/fargate_public_ip" \
+        --region $AWS_REGION \
+        --query "Parameter.Value" \
+        --output text)
+      - echo "DEBUG-- VITE_API_HOST_ADDRESS=$VITE_API_HOST_ADDRESS"
+      # ファイルの内容のうち、VITE_API_HOST_ADDRESS の値を CodeBuild の環境変数で上書き
+      # - sed -i "s|^VITE_API_HOST_ADDRESS=.*|VITE_API_HOST_ADDRESS=${VITE_API_HOST_ADDRESS}|" .env/.development/frontend
+  build:
+    commands:
+      - echo "フロントエンドイメージのビルドを開始 dockerfile内でARGを使っていビルド時に必要な環境変数は--build-argで指定する"
+      # フロントエンドイメージのビルドを開始 dockerfile内でARGを使っていビルド時に必要な環境変数は--build-argで指定する
+      - docker build \
+          --build-arg VITE_API_HOST_ADDRESS=$VITE_API_HOST_ADDRESS \
+          -t $IMAGE_REPO_NAME:$IMAGE_TAG ./frontend
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $ECR_REPO_URI:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo Pushing frontend image...
+      - docker push $ECR_REPO_URI:$IMAGE_TAG
+artifacts:
+  files:
+    - '**/*'
+
+# 中で使っている変数について : これらはCodeBuildのEnvironment.EvnironmentVariablesで設定している
+# AWS_REGION : ap-northeast-1
+# IMAGE_REPO_NAME	: fargate-backend or fargate-frontend
+# IMAGE_TAG	: latest(またはバージョン番号）
+# ECR_REPO_URI : <ランダムな>123456789012.dkr.ecr.ap-northeast-1.amazonaws.com/fargate-backend

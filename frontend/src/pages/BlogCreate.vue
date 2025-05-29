@@ -76,19 +76,42 @@ const { value: contents_text} = useField<string>('contents_text')
 const errorMessage = ref("")
 const router = useRouter()
 
+// ブラウザの Cookie に保存されている csrftoken の値を取得する関数。取得できなければ null を返す。
+function getCSRFToken() {
+  const name = 'csrftoken=';
+  const decodedCookies = decodeURIComponent(document.cookie);
+  const cookies = decodedCookies.split(';');
+  for (let cookie of cookies) {
+    cookie = cookie.trim();
+    if (cookie.startsWith(name)) {
+      return cookie.substring(name.length);
+    }
+  }
+  return null;
+}
+
 const submitBlog = handleSubmit (async (form_values) => {
     console.log("form_values=",form_values);
+    const csrfToken = getCSRFToken();
+    // APIに JSON を送るため、Content-Type を指定します
+    const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+    };
+    console.log("HandleSubmmit--csrfToken=",csrfToken);
+   
+    if (csrfToken) {
+        // CSRFトークンを取得できたなら、ヘッダーに加える
+        headers['X-CSRFToken'] = csrfToken;
+    }
+    console.log("HandleSubmmit--headers=",headers);
     try {
         // バックエンドへPOSTリクエスト 第2引数がオブジェクトで、バックエンドへ渡す内容
         // オブジェクトのbodyについては、「refで定義した変数 = フォームのinputやtextareaの記述内容」からオブジェクトを作成 → 「JSON.stringifyで文字列化した結果」がbodyの値になっている
         const response = await fetch(`${baseURL}/api/v1/blogs/`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
+            headers, // 上で定義したヘッダーを使用(post,put,deleteリクエストならば、必要)
+            credentials: 'include',
             body: JSON.stringify({
-                // title: title.value,
-                // contents_text: contentsText.value,
                 title: form_values.title,
                 contents_text: form_values.contents_text,
             }),

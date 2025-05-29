@@ -159,8 +159,6 @@ TIME_ZONE = 'Asia/Tokyo'
 USE_I18N = True
 
 
-
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
@@ -190,3 +188,6 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
 # CSRF_TRUSTED_ORIGINSに、バックエンドへのnginxへのアクセス先を追加 = これをやらないとdjangoAdmin画面にログインできない
 CSRF_TRUSTED_ORIGINS=[]
 CSRF_TRUSTED_ORIGINS.append(os.getenv("VITE_FRONT_HOST_ADDRESS"))
+# ↓CSRF_COOKIE_HTTPONLYとCSRF_COOKIE_SAMESITEがなくても、フロントエンドの対応だけでput,post,deleteなどができることが判明
+# CSRF_COOKIE_HTTPONLY = False
+# CSRF_COOKIE_SAMESITE = 'Lax'
