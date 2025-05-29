@@ -5,6 +5,7 @@ services:
       dockerfile: ./frontend/dockerfile/development/Dockerfile
       args:
         VITE_API_HOST_ADDRESS: http://localhost
+    image: djangoblog_development_frontend_img
     container_name: djangoblog_development_frontend
     ports:
       - "80:80"
