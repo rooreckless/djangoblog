@@ -9,8 +9,6 @@ services:
     ports:
       - "80:80"
     restart: always
-    # volumes:
-    #   - ./backend/static:/static  # ← これを追加 adminやapi/docs用cssを
     env_file:
       - .envs/development/frontend
     depends_on:
